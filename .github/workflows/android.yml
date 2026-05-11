@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Native Android APK
 
 on:
   workflow_dispatch:
@@ -23,47 +23,178 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install system dependencies
+      - name: Install Android SDK packages
         run: |
-          sudo apt update
-          sudo apt install -y \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            python3-pip \
-            python3-setuptools \
-            python3-venv \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
-            cmake \
-            libffi-dev \
-            libssl-dev \
-            build-essential
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "platform-tools"
 
-      - name: Install Buildozer
+      - name: Download Gradle
         run: |
-          python3 -m pip install --upgrade pip setuptools wheel
-          python3 -m pip install cython==0.29.36
-          python3 -m pip install buildozer
+          wget https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip gradle-8.7-bin.zip
+          echo "$PWD/gradle-8.7/bin" >> $GITHUB_PATH
 
-      - name: Show Buildozer version
+      - name: Create native Android WebView project
         run: |
-          buildozer --version
+          mkdir -p app/src/main/java/com/kaushikin/contentcreation
 
-      - name: Build debug APK
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
+          rootProject.name = "ContentCreation"
+          include ":app"
+          EOF
+
+          cat > build.gradle <<'EOF'
+          plugins {
+              id "com.android.application" version "8.6.1" apply false
+          }
+          EOF
+
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id "com.android.application"
+          }
+
+          android {
+              namespace "com.kaushikin.contentcreation"
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId "com.kaushikin.contentcreation"
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          EOF
+
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+              <application
+                  android:theme="@style/AppTheme"
+                  android:label="Content Creation"
+                  android:usesCleartextTraffic="true"
+                  android:resizeableActivity="true">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:screenOrientation="portrait">
+
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+
+                  </activity>
+
+              </application>
+
+          </manifest>
+          EOF
+
+          mkdir -p app/src/main/res/values
+
+          cat > app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:windowNoTitle">true</item>
+                  <item name="android:windowActionBar">false</item>
+                  <item name="android:windowFullscreen">true</item>
+                  <item name="android:windowLightStatusBar">false</item>
+              </style>
+          </resources>
+          EOF
+
+          cat > app/src/main/java/com/kaushikin/contentcreation/MainActivity.java <<'EOF'
+          package com.kaushikin.contentcreation;
+
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.graphics.Color;
+          import android.view.View;
+          import android.view.Window;
+          import android.view.WindowManager;
+          import android.webkit.WebChromeClient;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+
+          public class MainActivity extends Activity {
+
+              private WebView webView;
+              private static final String APP_URL = "https://content-creation-black.vercel.app/";
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  requestWindowFeature(Window.FEATURE_NO_TITLE);
+                  getWindow().setFlags(
+                      WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                      WindowManager.LayoutParams.FLAG_FULLSCREEN
+                  );
+
+                  webView = new WebView(this);
+                  webView.setBackgroundColor(Color.WHITE);
+
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setDatabaseEnabled(true);
+                  settings.setLoadWithOverviewMode(true);
+                  settings.setUseWideViewPort(true);
+                  settings.setBuiltInZoomControls(false);
+                  settings.setDisplayZoomControls(false);
+                  settings.setMediaPlaybackRequiresUserGesture(false);
+
+                  webView.setWebViewClient(new WebViewClient());
+                  webView.setWebChromeClient(new WebChromeClient());
+
+                  setContentView(webView);
+                  webView.loadUrl(APP_URL);
+              }
+
+              @Override
+              public void onBackPressed() {
+                  if (webView != null && webView.canGoBack()) {
+                      webView.goBack();
+                  } else {
+                      super.onBackPressed();
+                  }
+              }
+          }
+          EOF
+
+      - name: Build APK
         run: |
-          buildozer android debug
+          gradle assembleDebug
 
-      - name: Upload APK artifact
-        if: success()
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: content-creation-apk
-          path: bin/*.apk
+          name: content-creation-native-apk
+          path: app/build/outputs/apk/debug/*.apk
