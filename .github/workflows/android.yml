@@ -74,6 +74,11 @@ jobs:
           }
           EOF
 
+          cat > gradle.properties <<'EOF'
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
+
           cat > app/build.gradle <<'EOF'
           plugins {
               id "com.android.application"
@@ -90,6 +95,10 @@ jobs:
                   versionCode 1
                   versionName "1.0"
               }
+          }
+
+          dependencies {
+              implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
           }
           EOF
 
@@ -175,17 +184,41 @@ jobs:
 
           import android.app.Activity;
           import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
           import android.graphics.Color;
+          import android.graphics.Typeface;
+          import android.graphics.drawable.GradientDrawable;
+          import android.net.ConnectivityManager;
+          import android.net.Network;
+          import android.net.NetworkCapabilities;
+          import android.view.Gravity;
+          import android.view.View;
+          import android.view.ViewGroup;
           import android.view.Window;
           import android.view.WindowManager;
           import android.webkit.WebChromeClient;
+          import android.webkit.WebResourceError;
+          import android.webkit.WebResourceRequest;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
+          import android.widget.Button;
+          import android.widget.FrameLayout;
+          import android.widget.LinearLayout;
+          import android.widget.ProgressBar;
+          import android.widget.TextView;
+
+          import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
           public class MainActivity extends Activity {
 
               private WebView webView;
+              private FrameLayout rootLayout;
+              private SwipeRefreshLayout swipeRefreshLayout;
+              private LinearLayout splashLayout;
+              private LinearLayout noInternetLayout;
+
               private static final String APP_URL = "https://content-creation-black.vercel.app/";
 
               @Override
@@ -199,6 +232,33 @@ jobs:
                       WindowManager.LayoutParams.FLAG_FULLSCREEN
                   );
 
+                  createRootLayout();
+                  createWebView();
+                  createSwipeRefreshLayout();
+                  createSplashScreen();
+                  createNoInternetScreen();
+
+                  setContentView(rootLayout);
+
+                  showSplashScreen();
+
+                  new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                      @Override
+                      public void run() {
+                          loadApp();
+                      }
+                  }, 1500);
+              }
+
+              private void createRootLayout() {
+                  rootLayout = new FrameLayout(this);
+                  rootLayout.setLayoutParams(new FrameLayout.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      ViewGroup.LayoutParams.MATCH_PARENT
+                  ));
+              }
+
+              private void createWebView() {
                   webView = new WebView(this);
                   webView.setBackgroundColor(Color.WHITE);
 
@@ -214,16 +274,294 @@ jobs:
                   settings.setAllowFileAccess(true);
                   settings.setAllowContentAccess(true);
 
-                  webView.setWebViewClient(new WebViewClient());
                   webView.setWebChromeClient(new WebChromeClient());
 
-                  setContentView(webView);
-                  webView.loadUrl(APP_URL);
+                  webView.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public void onPageFinished(WebView view, String url) {
+                          super.onPageFinished(view, url);
+
+                          if (swipeRefreshLayout != null) {
+                              swipeRefreshLayout.setRefreshing(false);
+                          }
+
+                          hideSplashAndNoInternet();
+                      }
+
+                      @Override
+                      public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                          super.onReceivedError(view, request, error);
+
+                          if (swipeRefreshLayout != null) {
+                              swipeRefreshLayout.setRefreshing(false);
+                          }
+
+                          if (request != null && request.isForMainFrame()) {
+                              showNoInternetScreen();
+                          }
+                      }
+                  });
+              }
+
+              private void createSwipeRefreshLayout() {
+                  swipeRefreshLayout = new SwipeRefreshLayout(this);
+                  swipeRefreshLayout.setColorSchemeColors(
+                      Color.rgb(255, 106, 0),
+                      Color.rgb(255, 0, 80),
+                      Color.rgb(120, 50, 255)
+                  );
+
+                  swipeRefreshLayout.addView(webView, new SwipeRefreshLayout.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      ViewGroup.LayoutParams.MATCH_PARENT
+                  ));
+
+                  swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                      @Override
+                      public void onRefresh() {
+                          if (isInternetAvailable()) {
+                              noInternetLayout.setVisibility(View.GONE);
+                              swipeRefreshLayout.setVisibility(View.VISIBLE);
+
+                              if (webView.getUrl() == null) {
+                                  webView.loadUrl(APP_URL);
+                              } else {
+                                  webView.reload();
+                              }
+                          } else {
+                              swipeRefreshLayout.setRefreshing(false);
+                              showNoInternetScreen();
+                          }
+                      }
+                  });
+
+                  rootLayout.addView(swipeRefreshLayout, new FrameLayout.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      ViewGroup.LayoutParams.MATCH_PARENT
+                  ));
+              }
+
+              private void createSplashScreen() {
+                  splashLayout = new LinearLayout(this);
+                  splashLayout.setOrientation(LinearLayout.VERTICAL);
+                  splashLayout.setGravity(Gravity.CENTER);
+                  splashLayout.setPadding(40, 40, 40, 40);
+
+                  GradientDrawable bg = new GradientDrawable(
+                      GradientDrawable.Orientation.TOP_BOTTOM,
+                      new int[] {
+                          Color.rgb(10, 10, 20),
+                          Color.rgb(65, 20, 90),
+                          Color.rgb(255, 90, 0)
+                      }
+                  );
+                  splashLayout.setBackground(bg);
+
+                  TextView title = new TextView(this);
+                  title.setText("Trend Thala AI");
+                  title.setTextColor(Color.WHITE);
+                  title.setTextSize(34);
+                  title.setTypeface(Typeface.DEFAULT_BOLD);
+                  title.setGravity(Gravity.CENTER);
+
+                  TextView subtitle = new TextView(this);
+                  subtitle.setText("AI Content Creation Studio");
+                  subtitle.setTextColor(Color.rgb(245, 245, 245));
+                  subtitle.setTextSize(16);
+                  subtitle.setGravity(Gravity.CENTER);
+                  subtitle.setPadding(0, 15, 0, 35);
+
+                  ProgressBar progressBar = new ProgressBar(this);
+                  progressBar.setIndeterminate(true);
+
+                  TextView loading = new TextView(this);
+                  loading.setText("Loading...");
+                  loading.setTextColor(Color.WHITE);
+                  loading.setTextSize(14);
+                  loading.setGravity(Gravity.CENTER);
+                  loading.setPadding(0, 25, 0, 0);
+
+                  splashLayout.addView(title);
+                  splashLayout.addView(subtitle);
+                  splashLayout.addView(progressBar);
+                  splashLayout.addView(loading);
+
+                  rootLayout.addView(splashLayout, new FrameLayout.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      ViewGroup.LayoutParams.MATCH_PARENT
+                  ));
+              }
+
+              private void createNoInternetScreen() {
+                  noInternetLayout = new LinearLayout(this);
+                  noInternetLayout.setOrientation(LinearLayout.VERTICAL);
+                  noInternetLayout.setGravity(Gravity.CENTER);
+                  noInternetLayout.setPadding(45, 45, 45, 45);
+                  noInternetLayout.setBackgroundColor(Color.rgb(15, 15, 20));
+
+                  TextView icon = new TextView(this);
+                  icon.setText("📡");
+                  icon.setTextSize(54);
+                  icon.setGravity(Gravity.CENTER);
+
+                  TextView title = new TextView(this);
+                  title.setText("No Internet Connection");
+                  title.setTextColor(Color.WHITE);
+                  title.setTextSize(25);
+                  title.setTypeface(Typeface.DEFAULT_BOLD);
+                  title.setGravity(Gravity.CENTER);
+                  title.setPadding(0, 25, 0, 10);
+
+                  TextView message = new TextView(this);
+                  message.setText("Please check your network and try again.");
+                  message.setTextColor(Color.rgb(210, 210, 210));
+                  message.setTextSize(16);
+                  message.setGravity(Gravity.CENTER);
+                  message.setPadding(0, 0, 0, 30);
+
+                  Button retryButton = new Button(this);
+                  retryButton.setText("Retry");
+                  retryButton.setTextSize(16);
+                  retryButton.setTextColor(Color.WHITE);
+                  retryButton.setAllCaps(false);
+
+                  GradientDrawable buttonBg = new GradientDrawable();
+                  buttonBg.setColor(Color.rgb(255, 106, 0));
+                  buttonBg.setCornerRadius(50);
+                  retryButton.setBackground(buttonBg);
+
+                  LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      120
+                  );
+                  buttonParams.setMargins(30, 10, 30, 0);
+
+                  retryButton.setLayoutParams(buttonParams);
+
+                  retryButton.setOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View v) {
+                          showSplashScreen();
+
+                          new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                              @Override
+                              public void run() {
+                                  loadApp();
+                              }
+                          }, 800);
+                      }
+                  });
+
+                  noInternetLayout.addView(icon);
+                  noInternetLayout.addView(title);
+                  noInternetLayout.addView(message);
+                  noInternetLayout.addView(retryButton);
+
+                  rootLayout.addView(noInternetLayout, new FrameLayout.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      ViewGroup.LayoutParams.MATCH_PARENT
+                  ));
+
+                  noInternetLayout.setVisibility(View.GONE);
+              }
+
+              private void loadApp() {
+                  if (isInternetAvailable()) {
+                      splashLayout.setVisibility(View.VISIBLE);
+                      noInternetLayout.setVisibility(View.GONE);
+                      swipeRefreshLayout.setVisibility(View.VISIBLE);
+                      webView.setVisibility(View.VISIBLE);
+                      webView.loadUrl(APP_URL);
+                  } else {
+                      showNoInternetScreen();
+                  }
+              }
+
+              private boolean isInternetAvailable() {
+                  try {
+                      ConnectivityManager connectivityManager =
+                          (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+
+                      if (connectivityManager == null) {
+                          return false;
+                      }
+
+                      Network network = connectivityManager.getActiveNetwork();
+
+                      if (network == null) {
+                          return false;
+                      }
+
+                      NetworkCapabilities capabilities =
+                          connectivityManager.getNetworkCapabilities(network);
+
+                      return capabilities != null &&
+                          capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+
+                  } catch (Exception e) {
+                      return false;
+                  }
+              }
+
+              private void showSplashScreen() {
+                  if (splashLayout != null) {
+                      splashLayout.setVisibility(View.VISIBLE);
+                  }
+
+                  if (noInternetLayout != null) {
+                      noInternetLayout.setVisibility(View.GONE);
+                  }
+
+                  if (swipeRefreshLayout != null) {
+                      swipeRefreshLayout.setVisibility(View.VISIBLE);
+                  }
+
+                  if (webView != null) {
+                      webView.setVisibility(View.VISIBLE);
+                  }
+              }
+
+              private void showNoInternetScreen() {
+                  if (splashLayout != null) {
+                      splashLayout.setVisibility(View.GONE);
+                  }
+
+                  if (swipeRefreshLayout != null) {
+                      swipeRefreshLayout.setRefreshing(false);
+                      swipeRefreshLayout.setVisibility(View.GONE);
+                  }
+
+                  if (webView != null) {
+                      webView.setVisibility(View.GONE);
+                  }
+
+                  if (noInternetLayout != null) {
+                      noInternetLayout.setVisibility(View.VISIBLE);
+                  }
+              }
+
+              private void hideSplashAndNoInternet() {
+                  if (splashLayout != null) {
+                      splashLayout.setVisibility(View.GONE);
+                  }
+
+                  if (noInternetLayout != null) {
+                      noInternetLayout.setVisibility(View.GONE);
+                  }
+
+                  if (swipeRefreshLayout != null) {
+                      swipeRefreshLayout.setRefreshing(false);
+                      swipeRefreshLayout.setVisibility(View.VISIBLE);
+                  }
+
+                  if (webView != null) {
+                      webView.setVisibility(View.VISIBLE);
+                  }
               }
 
               @Override
               public void onBackPressed() {
-                  if (webView != null && webView.canGoBack()) {
+                  if (webView != null && webView.getVisibility() == View.VISIBLE && webView.canGoBack()) {
                       webView.goBack();
                   } else {
                       super.onBackPressed();
