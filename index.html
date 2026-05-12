@@ -3,50 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Trend Thala AI</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #09090f, #3b0764, #ff6a00);
       color: white;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       text-align: center;
-      padding: 20px;
+      padding: 22px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 35px 0;
     }
 
     .card {
       width: 100%;
-      max-width: 480px;
       background: rgba(0, 0, 0, 0.45);
-      padding: 28px;
-      border-radius: 24px;
+      padding: 26px;
+      border-radius: 26px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
     }
 
     h1 {
       font-size: 34px;
-      margin-bottom: 10px;
+      margin: 0 0 10px;
+      line-height: 1.15;
     }
 
-    p {
+    .subtitle {
       font-size: 17px;
       line-height: 1.5;
       color: #f3f3f3;
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      margin: 28px 0 14px;
+      font-weight: bold;
     }
 
     .btn {
       display: block;
+      width: 100%;
       margin: 14px 0;
-      padding: 16px 18px;
-      border-radius: 14px;
+      padding: 17px 18px;
+      border-radius: 16px;
       color: white;
       text-decoration: none;
       font-weight: bold;
       font-size: 18px;
+      border: none;
     }
 
     .telegram {
@@ -65,40 +85,232 @@
       background: #25D366;
     }
 
+    .upload-box {
+      margin-top: 18px;
+      padding: 22px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 2px dashed rgba(255,255,255,0.45);
+    }
+
+    label {
+      display: block;
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      background: white;
+      color: black;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      border: none;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #e6e6e6;
+      line-height: 1.4;
+    }
+
+    .preview {
+      margin-top: 18px;
+      display: none;
+    }
+
+    .preview img {
+      width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.3);
+      padding: 8px;
+    }
+
+    .file-list {
+      margin-top: 14px;
+      text-align: left;
+      font-size: 15px;
+      color: #fff;
+      background: rgba(0,0,0,0.25);
+      padding: 14px;
+      border-radius: 14px;
+      display: none;
+      word-break: break-word;
+    }
+
     .badge {
-      margin-top: 20px;
-      padding: 12px 18px;
+      margin-top: 24px;
+      padding: 14px 18px;
       background: rgba(255,255,255,0.15);
       border-radius: 999px;
       font-weight: bold;
       font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .success {
+      margin-top: 16px;
+      color: #86efac;
+      font-weight: bold;
+      display: none;
+    }
+
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 30px;
+      }
+
+      .card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .btn {
+        font-size: 17px;
+        padding: 16px;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>Trend Thala AI</h1>
-    <p>Testing external links from Android WebView.</p>
+  <div class="wrapper">
+    <div class="card">
+      <h1>Trend Thala AI</h1>
 
-    <a class="btn telegram" href="https://t.me/iPeTrK9edbA5MTU9">
-      Open Telegram
-    </a>
+      <p class="subtitle">
+        Testing Android WebView features: external links, file upload and image preview.
+      </p>
 
-    <a class="btn instagram" href="https://www.instagram.com/anpavaam">
-      Open Instagram
-    </a>
+      <div class="section-title">External Link Test</div>
 
-    <a class="btn youtube" href="https://www.youtube.com">
-      Open YouTube
-    </a>
+      <a class="btn telegram" href="https://t.me/iPeTrK9edbA5MTU9">
+        Open Telegram
+      </a>
 
-    <a class="btn whatsapp" href="https://wa.me/919999999999">
-      Open WhatsApp Test
-    </a>
+      <a class="btn instagram" href="https://www.instagram.com/anpavaam">
+        Open Instagram
+      </a>
 
-    <div class="badge">
-      Main page should stay inside app. Buttons should open outside.
+      <a class="btn youtube" href="https://www.youtube.com">
+        Open YouTube
+      </a>
+
+      <a class="btn whatsapp" href="https://wa.me/919999999999">
+        Open WhatsApp Test
+      </a>
+
+      <div class="section-title">Single Image Upload Test</div>
+
+      <div class="upload-box">
+        <label for="singleImage">Choose one image</label>
+
+        <input
+          id="singleImage"
+          type="file"
+          accept="image/*"
+        />
+
+        <div class="hint">
+          Tap this inside APK. Android file picker should open.
+        </div>
+
+        <div id="singleSuccess" class="success">
+          Image selected successfully ✅
+        </div>
+
+        <div id="imagePreview" class="preview">
+          <img id="previewImg" alt="Selected image preview" />
+        </div>
+      </div>
+
+      <div class="section-title">Multiple File Upload Test</div>
+
+      <div class="upload-box">
+        <label for="multiFile">Choose multiple files</label>
+
+        <input
+          id="multiFile"
+          type="file"
+          multiple
+        />
+
+        <div class="hint">
+          Select multiple files/images to test multi-upload support.
+        </div>
+
+        <div id="multiSuccess" class="success">
+          Files selected successfully ✅
+        </div>
+
+        <div id="fileList" class="file-list"></div>
+      </div>
+
+      <div class="badge">
+        Main page stays inside app. External buttons open outside. Upload buttons should open Android file picker.
+      </div>
     </div>
   </div>
+
+  <script>
+    const singleImageInput = document.getElementById("singleImage");
+    const imagePreview = document.getElementById("imagePreview");
+    const previewImg = document.getElementById("previewImg");
+    const singleSuccess = document.getElementById("singleSuccess");
+
+    const multiFileInput = document.getElementById("multiFile");
+    const fileList = document.getElementById("fileList");
+    const multiSuccess = document.getElementById("multiSuccess");
+
+    singleImageInput.addEventListener("change", function () {
+      const file = this.files && this.files[0];
+
+      if (!file) {
+        imagePreview.style.display = "none";
+        singleSuccess.style.display = "none";
+        return;
+      }
+
+      singleSuccess.style.display = "block";
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          previewImg.src = e.target.result;
+          imagePreview.style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.style.display = "none";
+      }
+    });
+
+    multiFileInput.addEventListener("change", function () {
+      const files = Array.from(this.files || []);
+
+      if (files.length === 0) {
+        fileList.style.display = "none";
+        multiSuccess.style.display = "none";
+        fileList.innerHTML = "";
+        return;
+      }
+
+      multiSuccess.style.display = "block";
+      fileList.style.display = "block";
+
+      fileList.innerHTML = files
+        .map((file, index) => {
+          return `${index + 1}. ${file.name} (${Math.round(file.size / 1024)} KB)`;
+        })
+        .join("<br>");
+    });
+  </script>
 </body>
 </html>
