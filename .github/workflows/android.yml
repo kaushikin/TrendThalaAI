@@ -1,4 +1,4 @@
-name: Build Trend Thala AI APK
+name: Build Trend Thala AI Release APK
 
 on:
   workflow_dispatch:
@@ -92,8 +92,25 @@ jobs:
                   applicationId "com.kaushikin.trendthalaai"
                   minSdk 23
                   targetSdk 35
-                  versionCode 1
-                  versionName "1.0"
+                  versionCode 2
+                  versionName "1.0.1"
+              }
+
+              signingConfigs {
+                  release {
+                      storeFile file("trend-thala-ai-release.jks")
+                      storePassword "TrendThalaAI123"
+                      keyAlias "trendthalaai"
+                      keyPassword "TrendThalaAI123"
+                  }
+              }
+
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                      shrinkResources false
+                      signingConfig signingConfigs.release
+                  }
               }
           }
 
@@ -207,6 +224,7 @@ jobs:
           import android.view.WindowManager;
           import android.webkit.ValueCallback;
           import android.webkit.WebChromeClient;
+          import android.webkit.WebChromeClient.FileChooserParams;
           import android.webkit.WebResourceError;
           import android.webkit.WebResourceRequest;
           import android.webkit.WebSettings;
@@ -215,6 +233,7 @@ jobs:
           import android.webkit.CookieManager;
           import android.webkit.DownloadListener;
           import android.webkit.URLUtil;
+          import android.webkit.MimeTypeMap;
           import android.widget.Button;
           import android.widget.FrameLayout;
           import android.widget.LinearLayout;
@@ -554,13 +573,30 @@ jobs:
                       String scheme = uri.getScheme();
                       String host = uri.getHost();
 
-                      if ((url.startsWith("http://") || url.startsWith("https://"))
-                              && host != null
-                              && host.equals(MAIN_HOST)) {
-                          return false;
+                      if (url.startsWith("blob:")) {
+                          Toast.makeText(
+                              this,
+                              "Blob downloads need website-side support",
+                              Toast.LENGTH_LONG
+                          ).show();
+                          return true;
                       }
 
                       if (url.startsWith("http://") || url.startsWith("https://")) {
+
+                          if (isDownloadableUrl(url)) {
+                              String userAgent = webView != null
+                                  ? webView.getSettings().getUserAgentString()
+                                  : null;
+
+                              handleDownload(url, userAgent, null, getMimeTypeFromUrl(url));
+                              return true;
+                          }
+
+                          if (host != null && host.equals(MAIN_HOST)) {
+                              return false;
+                          }
+
                           openExternalUrl(url);
                           return true;
                       }
@@ -601,6 +637,59 @@ jobs:
                   return false;
               }
 
+              private boolean isDownloadableUrl(String url) {
+                  try {
+                      Uri uri = Uri.parse(url);
+                      String path = uri.getPath();
+
+                      if (path == null) {
+                          return false;
+                      }
+
+                      path = path.toLowerCase();
+
+                      return path.endsWith(".pdf") ||
+                             path.endsWith(".png") ||
+                             path.endsWith(".jpg") ||
+                             path.endsWith(".jpeg") ||
+                             path.endsWith(".webp") ||
+                             path.endsWith(".gif") ||
+                             path.endsWith(".mp4") ||
+                             path.endsWith(".mp3") ||
+                             path.endsWith(".wav") ||
+                             path.endsWith(".zip") ||
+                             path.endsWith(".txt") ||
+                             path.endsWith(".csv") ||
+                             path.endsWith(".doc") ||
+                             path.endsWith(".docx") ||
+                             path.endsWith(".xls") ||
+                             path.endsWith(".xlsx") ||
+                             path.endsWith(".ppt") ||
+                             path.endsWith(".pptx");
+                  } catch (Exception e) {
+                      return false;
+                  }
+              }
+
+              private String getMimeTypeFromUrl(String url) {
+                  try {
+                      String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+
+                      if (extension != null && !extension.isEmpty()) {
+                          String mime = MimeTypeMap.getSingleton()
+                              .getMimeTypeFromExtension(extension.toLowerCase());
+
+                          if (mime != null) {
+                              return mime;
+                          }
+                      }
+                  } catch (Exception e) {
+                      // Ignore
+                  }
+
+                  return "application/octet-stream";
+              }
+
               private void openExternalUrl(String url) {
                   try {
                       Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -631,10 +720,13 @@ jobs:
                       DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                       request.setTitle(fileName);
                       request.setDescription("Downloading file...");
-                      request.setMimeType(mimeType);
                       request.setNotificationVisibility(
                           DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
                       );
+
+                      if (mimeType != null && !mimeType.trim().isEmpty()) {
+                          request.setMimeType(mimeType);
+                      }
 
                       String cookies = CookieManager.getInstance().getCookie(url);
                       if (cookies != null) {
@@ -804,12 +896,25 @@ jobs:
           }
           EOF
 
-      - name: Build APK
+      - name: Create release keystore
         run: |
-          gradle assembleDebug
+          keytool -genkeypair \
+            -v \
+            -keystore app/trend-thala-ai-release.jks \
+            -storepass TrendThalaAI123 \
+            -alias trendthalaai \
+            -keypass TrendThalaAI123 \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Trend Thala AI, OU=Trend Thala AI, O=Kaushikin, L=Chennai, S=Tamil Nadu, C=IN"
 
-      - name: Upload APK
+      - name: Build signed release APK
+        run: |
+          gradle assembleRelease
+
+      - name: Upload signed release APK
         uses: actions/upload-artifact@v4
         with:
-          name: trend-thala-ai-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: trend-thala-ai-release-apk
+          path: app/build/outputs/apk/release/*.apk
