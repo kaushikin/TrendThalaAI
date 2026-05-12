@@ -1,4 +1,4 @@
-name: Build Trend Thala AI Release APK
+name: Build Trend Thala AI Permanent Signed APK
 
 on:
   workflow_dispatch:
@@ -92,16 +92,16 @@ jobs:
                   applicationId "com.kaushikin.trendthalaai"
                   minSdk 23
                   targetSdk 35
-                  versionCode 2
-                  versionName "1.0.1"
+                  versionCode 3
+                  versionName "1.0.2"
               }
 
               signingConfigs {
                   release {
                       storeFile file("trend-thala-ai-release.jks")
-                      storePassword "TrendThalaAI123"
-                      keyAlias "trendthalaai"
-                      keyPassword "TrendThalaAI123"
+                      storePassword System.getenv("KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("KEY_ALIAS")
+                      keyPassword System.getenv("KEY_PASSWORD")
                   }
               }
 
@@ -896,25 +896,23 @@ jobs:
           }
           EOF
 
-      - name: Create release keystore
+      - name: Restore permanent release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          keytool -genkeypair \
-            -v \
-            -keystore app/trend-thala-ai-release.jks \
-            -storepass TrendThalaAI123 \
-            -alias trendthalaai \
-            -keypass TrendThalaAI123 \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Trend Thala AI, OU=Trend Thala AI, O=Kaushikin, L=Chennai, S=Tamil Nadu, C=IN"
+          echo "$KEYSTORE_BASE64" | base64 -d > app/trend-thala-ai-release.jks
+          ls -lh app/trend-thala-ai-release.jks
 
       - name: Build signed release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           gradle assembleRelease
 
       - name: Upload signed release APK
         uses: actions/upload-artifact@v4
         with:
-          name: trend-thala-ai-release-apk
+          name: trend-thala-ai-permanent-release-apk
           path: app/build/outputs/apk/release/*.apk
