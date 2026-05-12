@@ -186,6 +186,8 @@ jobs:
           import android.os.Bundle;
           import android.os.Handler;
           import android.os.Looper;
+          import android.content.Intent;
+          import android.net.Uri;
           import android.graphics.Color;
           import android.graphics.Typeface;
           import android.graphics.drawable.GradientDrawable;
@@ -220,6 +222,7 @@ jobs:
               private LinearLayout noInternetLayout;
 
               private static final String APP_URL = "https://content-creation-black.vercel.app/";
+              private static final String MAIN_HOST = "content-creation-black.vercel.app";
 
               @Override
               protected void onCreate(Bundle savedInstanceState) {
@@ -277,6 +280,20 @@ jobs:
                   webView.setWebChromeClient(new WebChromeClient());
 
                   webView.setWebViewClient(new WebViewClient() {
+
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                          if (request != null && request.getUrl() != null) {
+                              return handleUrl(request.getUrl().toString());
+                          }
+                          return false;
+                      }
+
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                          return handleUrl(url);
+                      }
+
                       @Override
                       public void onPageFinished(WebView view, String url) {
                           super.onPageFinished(view, url);
@@ -463,6 +480,76 @@ jobs:
                   ));
 
                   noInternetLayout.setVisibility(View.GONE);
+              }
+
+              private boolean handleUrl(String url) {
+                  if (url == null || url.trim().isEmpty()) {
+                      return false;
+                  }
+
+                  try {
+                      Uri uri = Uri.parse(url);
+                      String scheme = uri.getScheme();
+                      String host = uri.getHost();
+
+                      // Keep main app website inside WebView
+                      if ((url.startsWith("http://") || url.startsWith("https://"))
+                              && host != null
+                              && host.equals(MAIN_HOST)) {
+                          return false;
+                      }
+
+                      // Open external http/https links outside the app
+                      if (url.startsWith("http://") || url.startsWith("https://")) {
+                          openExternalUrl(url);
+                          return true;
+                      }
+
+                      // Open phone, email, SMS, WhatsApp, Telegram, Instagram, Facebook, Play Store links
+                      if (scheme != null) {
+                          if (
+                              scheme.equals("tel") ||
+                              scheme.equals("mailto") ||
+                              scheme.equals("sms") ||
+                              scheme.equals("whatsapp") ||
+                              scheme.equals("tg") ||
+                              scheme.equals("instagram") ||
+                              scheme.equals("fb") ||
+                              scheme.equals("market")
+                          ) {
+                              openExternalUrl(url);
+                              return true;
+                          }
+                      }
+
+                      // Handle Android intent:// links
+                      if (url.startsWith("intent://")) {
+                          try {
+                              Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+
+                              if (intent != null) {
+                                  startActivity(intent);
+                                  return true;
+                              }
+                          } catch (Exception e) {
+                              return true;
+                          }
+                      }
+
+                  } catch (Exception e) {
+                      return false;
+                  }
+
+                  return false;
+              }
+
+              private void openExternalUrl(String url) {
+                  try {
+                      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                      startActivity(intent);
+                  } catch (Exception e) {
+                      // If no app can open the link, ignore safely
+                  }
               }
 
               private void loadApp() {
