@@ -52,7 +52,7 @@
 
     .section-title {
       font-size: 22px;
-      margin: 28px 0 14px;
+      margin: 30px 0 14px;
       font-weight: bold;
     }
 
@@ -67,6 +67,7 @@
       font-weight: bold;
       font-size: 18px;
       border: none;
+      cursor: pointer;
     }
 
     .telegram {
@@ -83,6 +84,18 @@
 
     .whatsapp {
       background: #25D366;
+    }
+
+    .orange {
+      background: linear-gradient(45deg, #ff6a00, #ff004c);
+    }
+
+    .purple {
+      background: linear-gradient(45deg, #7c3aed, #db2777);
+    }
+
+    .green {
+      background: #16a34a;
     }
 
     .upload-box {
@@ -141,6 +154,7 @@
       border-radius: 14px;
       display: none;
       word-break: break-word;
+      line-height: 1.5;
     }
 
     .badge {
@@ -158,6 +172,16 @@
       color: #86efac;
       font-weight: bold;
       display: none;
+    }
+
+    .mini-card {
+      margin-top: 15px;
+      padding: 16px;
+      background: rgba(0,0,0,0.22);
+      border-radius: 16px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #f1f1f1;
     }
 
     @media (max-width: 420px) {
@@ -184,7 +208,7 @@
       <h1>Trend Thala AI</h1>
 
       <p class="subtitle">
-        Testing Android WebView features: external links, file upload and image preview.
+        Testing Android WebView features: external links, file upload, image preview and downloads.
       </p>
 
       <div class="section-title">External Link Test</div>
@@ -251,8 +275,41 @@
         <div id="fileList" class="file-list"></div>
       </div>
 
+      <div class="section-title">Download Test</div>
+
+      <div class="mini-card">
+        Use the PDF button first. It is the most reliable Android Download Manager test.
+      </div>
+
+      <a
+        class="btn telegram"
+        href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+      >
+        Download Test PDF
+      </a>
+
+      <a
+        class="btn green"
+        href="https://raw.githubusercontent.com/kaushikin/content-creation/main/index.html"
+        download="trend-thala-index.html"
+      >
+        Download HTML File
+      </a>
+
+      <button class="btn orange" onclick="downloadTextFile()">
+        Download Text File
+      </button>
+
+      <button class="btn purple" onclick="downloadCanvasImage()">
+        Generate & Download Image
+      </button>
+
+      <div id="downloadStatus" class="success">
+        Download triggered ✅
+      </div>
+
       <div class="badge">
-        Main page stays inside app. External buttons open outside. Upload buttons should open Android file picker.
+        Main page stays inside app. External buttons open outside. Upload opens file picker. PDF should download to Downloads folder.
       </div>
     </div>
   </div>
@@ -266,6 +323,7 @@
     const multiFileInput = document.getElementById("multiFile");
     const fileList = document.getElementById("fileList");
     const multiSuccess = document.getElementById("multiSuccess");
+    const downloadStatus = document.getElementById("downloadStatus");
 
     singleImageInput.addEventListener("change", function () {
       const file = this.files && this.files[0];
@@ -311,6 +369,96 @@
         })
         .join("<br>");
     });
+
+    function showDownloadStatus() {
+      downloadStatus.style.display = "block";
+
+      setTimeout(() => {
+        downloadStatus.style.display = "none";
+      }, 2500);
+    }
+
+    function downloadTextFile() {
+      const text = "Trend Thala AI download test successful!";
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "trend-thala-test.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      showDownloadStatus();
+    }
+
+    function downloadCanvasImage() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1080;
+
+      const ctx = canvas.getContext("2d");
+
+      const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
+      gradient.addColorStop(0, "#09090f");
+      gradient.addColorStop(0.45, "#3b0764");
+      gradient.addColorStop(1, "#ff6a00");
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 1080, 1080);
+
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      roundRect(ctx, 90, 250, 900, 560, 50);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 82px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Trend Thala AI", 540, 470);
+
+      ctx.font = "42px Arial";
+      ctx.fillText("Generated Image Test", 540, 550);
+
+      ctx.font = "bold 38px Arial";
+      ctx.fillStyle = "#ffcc70";
+      ctx.fillText("Download Successful", 540, 650);
+
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "trend-thala-generated-image.png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
+
+        showDownloadStatus();
+      }, "image/png");
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
   </script>
 </body>
 </html>
