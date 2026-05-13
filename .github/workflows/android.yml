@@ -99,6 +99,7 @@ jobs:
               signingConfigs {
                   release {
                       storeFile file("trend-thala-ai-release.jks")
+                      storeType "jks"
                       storePassword System.getenv("KEYSTORE_PASSWORD")
                       keyAlias System.getenv("KEY_ALIAS")
                       keyPassword System.getenv("KEY_PASSWORD")
@@ -902,6 +903,17 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 -d > app/trend-thala-ai-release.jks
           ls -lh app/trend-thala-ai-release.jks
+
+                - name: Verify release keystore
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          keytool -list \
+            -keystore app/trend-thala-ai-release.jks \
+            -storetype JKS \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -alias "$KEY_ALIAS"
 
       - name: Build signed release APK
         env:
