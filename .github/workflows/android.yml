@@ -92,8 +92,8 @@ jobs:
                   applicationId "com.kaushikin.trendthalaai"
                   minSdk 23
                   targetSdk 35
-                  versionCode 3
-                  versionName "1.0.2"
+                  versionCode 4
+                  versionName "1.0.3"
               }
 
               signingConfigs {
@@ -190,7 +190,6 @@ jobs:
           for folder, size in sizes.items():
               path = f"app/src/main/res/{folder}"
               os.makedirs(path, exist_ok=True)
-
               resized = img.resize((size, size), Image.LANCZOS)
               resized.save(f"{path}/ic_launcher.png")
               resized.save(f"{path}/ic_launcher_round.png")
@@ -251,7 +250,6 @@ jobs:
               private SwipeRefreshLayout swipeRefreshLayout;
               private LinearLayout splashLayout;
               private LinearLayout noInternetLayout;
-
               private ValueCallback<Uri[]> fileUploadCallback;
 
               private static final int FILE_CHOOSER_REQUEST_CODE = 101;
@@ -263,7 +261,6 @@ jobs:
                   super.onCreate(savedInstanceState);
 
                   requestWindowFeature(Window.FEATURE_NO_TITLE);
-
                   getWindow().setFlags(
                       WindowManager.LayoutParams.FLAG_FULLSCREEN,
                       WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -276,7 +273,6 @@ jobs:
                   createNoInternetScreen();
 
                   setContentView(rootLayout);
-
                   showSplashScreen();
 
                   new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -326,7 +322,6 @@ jobs:
                           fileUploadCallback = filePathCallback;
 
                           Intent intent;
-
                           try {
                               intent = fileChooserParams.createIntent();
                           } catch (Exception e) {
