@@ -1,103 +1,124 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+module.exports = async (req, res) => {
+  // CORS for safety
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  try {
-    const { topic, details, mood, figure, colors, effect } = req.body || {};
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-    if (!topic) {
-      return res.status(400).json({ error: "Topic is required" });
-    }
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-    const prompt = `
-You are Trend Thala AI, an AI content factory for Tamil creators.
+  const { topic, details, mood, figure, colors, effect } = req.body || {};
 
-Create a complete viral Tamil content pack.
+  if (!topic) {
+    return res.status(400).json({ error: 'Topic is required' });
+  }
 
-Topic:
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'OpenAI API key not configured on Vercel' });
+  }
+
+  const systemPrompt = `You are Trend Thala AI — the #1 viral content creator for Tamil YouTube Shorts & Instagram Reels. 
+You speak in natural Tamil-English mix and create super-engaging, dramatic, curiosity-driven content for Tamil audience.`;
+
+  const userPrompt = `Generate a complete TREND THALA AI CONTENT PACK using these inputs:
+
+Topic: ${topic}
+Key Details: ${details || 'No additional details'}
+Mood: ${mood || 'Dramatic'}
+Main Figure: ${figure || 'None'}
+Color Style: ${colors || 'Dark political'}
+Effect: ${effect || 'Fire'}
+
+Output **EXACTLY** in this format (no extra text, no explanations):
+
+:fire: TREND THALA AI CONTENT PACK
+
+TOPIC:
 ${topic}
 
-Key Details:
-${details || "No extra details provided"}
+KEY DETAILS:
+${details || ''}
 
-Mood:
-${mood || "Dramatic"}
+MOOD:
+${mood}
 
-Main Figure:
-${figure || "None"}
+MAIN FIGURE:
+${figure || ''}
 
-Color Style:
-${colors || "Dark political"}
-
-Effect:
-${effect || "Fire"}
-
-Output format:
+----------------------------------------
 
 PART 1: POSTER PROMPT
-Create a detailed 9:16 mobile-first Tamil news poster prompt.
+[Highly detailed vertical 9:16 poster prompt optimized for mobile. Include Tamil headline suggestions, mood, colors, effect, main figure, layout instructions.]
+
+----------------------------------------
 
 PART 2: YOUTUBE SHORTS 5 SCENES
-Create 5 scenes, each 10 seconds, with visual, text, effect, sound.
+SCENE 1 — HOOK:
+SCENE 2 — PROBLEM/DATA:
+SCENE 3 — TWIST:
+SCENE 4 — QUESTION:
+SCENE 5 — CTA:
+[Make scenes dynamic and highly relevant to the topic]
+
+----------------------------------------
 
 PART 3: YOUTUBE SHORTS TITLE
-Give 3 title options under 60 characters if possible.
+[One catchy title with emojis, Tamil-English mix]
+
+----------------------------------------
 
 PART 4: YOUTUBE DESCRIPTION
-Give a viral description with context and question.
+[Full description + social links exactly like this:
+:loudspeaker: Telegram: https://t.me/iPeTrK9edbA5MTU9
+:camera_with_flash: Instagram: https://www.instagram.com/anpavaam
+:blue_book: Facebook: https://facebook.com/share/1B6BCWHJJY
++ relevant hashtags]
+
+----------------------------------------
 
 PART 5: TAMIL VOICE OVER
-Give short Tamil voiceover text.
+[Full natural spoken Tamil script, 30-45 seconds, energetic and conversational]
+
+----------------------------------------
 
 PART 6: INSTAGRAM CAPTION
-Give Reels caption with hashtags.
+[Short punchy caption + hashtags]
 
-Style:
-Tamil-English mixed.
-Punchy.
-Mobile-first.
-Viral Tamil audience tone.
-No fake facts beyond given details.
-`;
+Make everything highly viral, creative, and perfect for Tamil creators.`;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a Tamil viral content strategist for YouTube Shorts, Instagram Reels, news posters and creator content.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.8,
-      }),
-    });
+  try {
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.8,
+        max_tokens: 2200,
+      }),
+    });
 
-    const data = await response.json();
+    if (!openaiRes.ok) throw new Error('OpenAI API error');
 
-    if (!response.ok) {
-      return res.status(500).json({
-        error: data.error?.message || "OpenAI API error",
-      });
-    }
+    const data = await openaiRes.json();
+    const content = data.choices[0].message.content.trim();
 
-    const output = data.choices?.[0]?.message?.content || "";
-
-    return res.status(200).json({ output });
-  } catch (error) {
-    return res.status(500).json({
-      error: error.message || "Server error",
-    });
-  }
-}
+    res.status(200).json({ success: true, content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'AI generation failed – using local fallback' });
+  }
+};
