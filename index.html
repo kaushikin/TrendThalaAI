@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trend Thala AI - Mr Tamilan Style</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <title>Trend Thala AI - Shorts Only</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -19,17 +19,16 @@
     .tagline { font-size: 16px; color: #ddd; margin-top: 8px; }
     .card { margin-top: 18px; padding: 24px; border-radius: 24px; background: rgba(0,0,0,0.45); }
     label { display: block; font-weight: bold; margin: 16px 0 8px; font-size: 15px; }
-    input, textarea, select { width: 100%; padding: 14px; border-radius: 15px; border: none; font-size: 16px; background: #fff; color: #111; font-family: 'Noto Sans Tamil', Arial, sans-serif; }
-    textarea { min-height: 100px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .btn { width: 100%; padding: 16px; margin: 12px 0 8px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; font-family: 'Noto Sans Tamil', Arial, sans-serif; }
+    input, textarea, select { width: 100%; padding: 14px; border-radius: 15px; border: none; font-size: 16px; background: #fff; color: #111; }
+    textarea { min-height: 80px; }
+    .btn { width: 100%; padding: 16px; margin: 12px 0 8px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; }
     .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
     .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
-    .output { margin-top: 20px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 16px; line-height: 1.7; font-size: 15.2px; white-space: pre-wrap; font-family: 'Noto Sans Tamil', Arial, sans-serif; }
+    .output { margin-top: 20px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 16px; line-height: 1.7; font-size: 15.2px; white-space: pre-wrap; }
     .preview { max-width: 100%; border-radius: 16px; margin: 12px 0; border: 3px solid #ff6a00; }
     .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .copy-btn { margin: 8px 4px; padding: 11px 18px; background: #22c55e; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Noto Sans Tamil', Arial, sans-serif; }
+    .copy-btn { margin: 8px 4px; padding: 11px 18px; background: #22c55e; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -37,20 +36,23 @@
     <section class="hero">
       <div class="logo">TT</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">Mr Tamilan Style • Tamil SEO • வைரல் ஷார்ட்ஸ்</p>
+      <p class="tagline">YouTube Shorts Only • Mr Tamilan Style • Viral Hooks</p>
     </section>
 
     <section class="card">
-      <div class="section-title">Create Viral Content Pack</div>
+      <div class="section-title">Create Viral YouTube Short</div>
 
       <label>Topic / News Headline</label>
-      <input id="topic" placeholder="விஜய் TVK மீட்டிங் தமிழ்நாட்டில் பெரும் பரபரப்பு" />
+      <input id="topic" placeholder="விஜய் TVK மீட்டிங் பெரும் பரபரப்பு" />
 
       <label>Key Details</label>
       <textarea id="details" placeholder="முக்கிய புள்ளிகள்..."></textarea>
 
       <label>Source / Reference Links</label>
       <textarea id="links" placeholder="https://..."></textarea>
+
+      <label>Special Instructions / Customization</label>
+      <textarea id="custom" placeholder="No voice over needed\nMake it more shocking\nOnly image and video prompts"></textarea>
 
       <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
@@ -61,12 +63,7 @@
         <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
       </div>
 
-      <div class="grid">
-        <div><label>Color Style</label><select id="colors"><option>Dark political</option><option>Saffron red</option><option>Neon</option></select></div>
-        <div><label>Effect</label><select id="effect"><option>Fire</option><option>Lightning</option><option>Cinematic</option></select></div>
-      </div>
-
-      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Mr Tamilan Style Pack</button>
+      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral YouTube Short Pack</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
 
       <div class="spinner" id="spinner"></div>
@@ -106,10 +103,9 @@
         topic: document.getElementById('topic').value.trim(),
         details: document.getElementById('details').value.trim(),
         links: document.getElementById('links').value.trim(),
+        custom: document.getElementById('custom').value.trim(),
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
-        colors: document.getElementById('colors').value,
-        effect: document.getElementById('effect').value,
         imageBase64: imageBase64,
         imageMime: imageMime
       };
@@ -147,14 +143,14 @@
       if (parts[num-1]) {
         let content = parts[num-1].replace(/^PART \d+:\s*/i, '').trim();
         navigator.clipboard.writeText(content);
-        alert(`✅ PART ${num} Content Copied!`);
+        alert(`✅ PART ${num} Copied!`);
       }
     }
 
     function copyOutput() {
       if (finalOutput) {
         navigator.clipboard.writeText(finalOutput);
-        alert("✅ Full Pack Copied!");
+        alert("✅ Full Shorts Pack Copied!");
       }
     }
   </script>
