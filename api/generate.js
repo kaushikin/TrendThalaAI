@@ -1,4 +1,5 @@
 module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -6,85 +7,102 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { topic, details, links, custom, mood, figure, imageBase64, imageMime } = req.body || {};
+  const { topic, details, sourceLinks, specialInstructions, mood, figure, colors, effect } = req.body || {};
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
-
-  const systemPrompt = `You are **Trend Thala AI** — Specialist in Mr Tamilan Style YouTube Shorts.
-
-**Mr Tamilan Viral Hook Formulas:**
-- Strong curiosity hooks: "என்ன நடந்தது?", "அப்பப்பா இது!", "Shock ஆகிடுவீங்க!", "இது உங்களுக்கு தெரியுமா?"
-- Emotional + Dramatic + Fast storytelling
-- Always 15-60 seconds Shorts friendly
-
-**CapCut Editing Style:**
-- Fast cuts (every 4-8 seconds)
-- Big bold Tamil text with zoom & animation
-- Trending transitions, fire, lightning, beat sync
-
-**Important Rules:**
-- Strictly follow Custom Instructions (if user says "No voice over", completely remove PART 8)
-- Focus only on YouTube Shorts
-- Use strong Tamil SEO keywords
-
-Output **EXACTLY** in this format only:`;
-
-  const outputFormat = `
-PART 1: Image / Reference Analysis
-PART 2: Viral Hook (First 3-5 seconds)
-PART 3: YouTube Shorts Titles (3 Super Clickbait)
-PART 4: Full Shorts Content Flow / Script
-PART 5: Grok Image Generation Prompt (9:16)
-PART 6: Grok Text-to-Video Prompt (6-10s scenes)
-PART 7: Grok Image-to-Video Prompt
-PART 8: Tamil Voiceover Script (Mr Tamilan Style) - Skip if custom says no voice over
-PART 9: CapCut Editing Template Suggestions
-PART 10: Hashtags & SEO Keywords`;
-
-  let userContent = `Topic: ${topic || 'No topic'}
-Details: ${details || 'None'}
-Links: ${links || 'None'}
-Mood: ${mood || 'Dramatic'}
-Figure: ${figure || 'None'}
-Custom Instructions: ${custom || 'None'}`;
-
-  let messages = [{ role: "system", content: systemPrompt + outputFormat }];
-
-  if (imageBase64 && imageMime) {
-    messages.push({
-      role: "user",
-      content: [
-        { type: "text", text: userContent + "\nAnalyze image and generate in Mr Tamilan Shorts style." },
-        { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
-      ]
-    });
-  } else {
-    messages.push({ role: "user", content: userContent });
+  if (!topic) {
+    return res.status(400).json({ error: 'Topic is required' });
   }
 
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'OpenAI key not configured' });
+  }
+
+  const systemPrompt = `You are Trend Thala AI — Viral Tamil YouTube Shorts & Reels content expert. Create super engaging, curiosity-driven, Tamil-English mixed content.`;
+
+  const userPrompt = `Create a complete VIRAL YouTube Short Pack:
+
+Topic: ${topic}
+Key Details: ${details || 'No extra details'}
+Source/Reference: ${sourceLinks || 'None'}
+Special Instructions: ${specialInstructions || 'None'}
+Mood: ${mood || 'Dramatic'}
+Main Figure: ${figure || 'None'}
+Colors: ${colors || 'Dark political'}
+Effect: ${effect || 'Fire'}
+
+Output **exactly** in this format (no extra explanations):
+
+🔥 TREND THALA AI CONTENT PACK
+
+TOPIC: ${topic}
+
+KEY DETAILS: ${details || ''}
+
+MOOD: ${mood}
+MAIN FIGURE: ${figure}
+
+----------------------------------------
+
+PART 1: POSTER PROMPT
+[Ultra-detailed 9:16 vertical poster prompt for AI image generator. Include Tamil headline ideas, main figure, mood, colors, effect, dramatic layout.]
+
+----------------------------------------
+
+PART 2: 5-SCENE YOUTUBE SHORTS SCRIPT
+SCENE 1 — HOOK:
+SCENE 2 — PROBLEM/DATA:
+SCENE 3 — TWIST:
+SCENE 4 — QUESTION / REACTION:
+SCENE 5 — CTA:
+
+----------------------------------------
+
+PART 3: YOUTUBE SHORTS TITLE
+[One super catchy title with emojis]
+
+----------------------------------------
+
+PART 4: YOUTUBE DESCRIPTION
+[Full description with social links + hashtags]
+
+----------------------------------------
+
+PART 5: TAMIL VOICE OVER
+[Natural, energetic spoken Tamil script ~30-45 seconds]
+
+----------------------------------------
+
+PART 6: INSTAGRAM CAPTION + HASHTAGS
+
+Make it highly viral for Tamil audience.`;
+
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o",
-        messages: messages,
-        temperature: 0.88,
-        max_tokens: 3200
-      })
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.85,
+        max_tokens: 2400,
+      }),
     });
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content || "Generation failed.";
+    if (!openaiRes.ok) throw new Error('OpenAI error');
 
-    res.json({ success: true, content });
+    const data = await openaiRes.json();
+    const content = data.choices[0].message.content.trim();
 
+    res.status(200).json({ success: true, content });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: 'Generation failed' });
+    res.status(500).json({ success: false, error: 'AI failed - fallback activated' });
   }
 };
