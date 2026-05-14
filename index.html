@@ -36,7 +36,7 @@
     <section class="hero">
       <div class="logo">TT</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">YouTube Shorts Only • Mr Tamilan Style • Viral Hooks</p>
+      <p class="tagline">YouTube Shorts Only • Mr Tamilan Style</p>
     </section>
 
     <section class="card">
@@ -51,8 +51,8 @@
       <label>Source / Reference Links</label>
       <textarea id="links" placeholder="https://..."></textarea>
 
-      <label>Special Instructions / Customization</label>
-      <textarea id="custom" placeholder="No voice over needed\nMake it more shocking\nOnly image and video prompts"></textarea>
+      <label>Special Instructions (Custom)</label>
+      <textarea id="custom" placeholder="No voice over needed\nOnly image and video prompts\nMake it more shocking"></textarea>
 
       <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
@@ -63,7 +63,7 @@
         <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
       </div>
 
-      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral YouTube Short Pack</button>
+      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral Shorts Pack</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
 
       <div class="spinner" id="spinner"></div>
@@ -71,111 +71,89 @@
     </section>
   </div>
 
-<script>
-let finalOutput = "";
+  <script>
+    let finalOutput = "";
+    let imageBase64 = null;
+    let imageMime = null;
 
-function getValue(id, fallback = "") {
-  const el = document.getElementById(id);
-  return el && el.value.trim() ? el.value.trim() : fallback;
-}
-
-function generateLocalPack() {
-  // Same reliable local fallback as before
-  const topic = getValue("topic", "Trending Tamil news update");
-  const details = getValue("details", "- Key detail 1\n- Key detail 2");
-  const mood = getValue("mood", "Dramatic");
-  const figure = getValue("figure", "None");
-
-  finalOutput = `🔥 TREND THALA AI CONTENT PACK
-
-TOPIC: ${topic}
-
-KEY DETAILS:
-${details}
-
-MOOD: ${mood}
-MAIN FIGURE: ${figure}
-
-----------------------------------------
-[Local fallback generated - AI is better when working]
-`;
-
-  const output = document.getElementById("output");
-  output.style.display = "block";
-  output.textContent = finalOutput;
-}
-
-async function generatePack() {
-  const topic = getValue("topic");
-  if (!topic) {
-    alert("Topic / News Headline போடுங்க!");
-    return;
-  }
-
-  const btn = document.querySelector('.btn.primary') || document.querySelector('button[onclick*="generatePack"]');
-  const originalText = btn ? btn.textContent : "Generate";
-
-  const outputEl = document.getElementById("output");
-  outputEl.style.display = "block";
-  outputEl.textContent = "🤖 Trend Thala AI generating viral pack...\n\n(5-12 seconds)";
-
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Generating with AI... 🔥";
-  }
-
-  try {
-    const payload = {
-      topic: topic,
-      details: getValue("details"),
-      sourceLinks: getValue("sourceLinks", ""),
-      specialInstructions: getValue("specialInstructions", ""),
-      mood: getValue("mood", "Dramatic"),
-      figure: getValue("figure", "None"),
-      colors: getValue("colors", "Dark political"),
-      effect: getValue("effect", "Fire")
-    };
-
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    // Image Upload
+    document.getElementById('imageUpload').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        imageBase64 = ev.target.result.split(',')[1];
+        imageMime = file.type;
+        const preview = document.getElementById('imagePreview');
+        preview.src = ev.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
     });
 
-    const data = await response.json();
+    async function generatePack() {
+      const btn = document.getElementById('generateBtn');
+      const spinner = document.getElementById('spinner');
+      const outputDiv = document.getElementById('output');
 
-    if (data.success && data.content) {
-      finalOutput = data.content;
-      outputEl.textContent = finalOutput;
-    } else {
-      throw new Error("API failed");
-    }
-  } catch (err) {
-    console.log("AI failed → fallback");
-    generateLocalPack();
-  } finally {
-    if (btn) {
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      outputDiv.style.display = 'none';
+
+      const data = {
+        topic: document.getElementById('topic').value.trim(),
+        details: document.getElementById('details').value.trim(),
+        links: document.getElementById('links').value.trim(),
+        custom: document.getElementById('custom').value.trim(),
+        mood: document.getElementById('mood').value,
+        figure: document.getElementById('figure').value.trim(),
+        imageBase64: imageBase64,
+        imageMime: imageMime
+      };
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        finalOutput = result.content || "Generation completed.";
+      } catch (e) {
+        finalOutput = "❌ API failed. Please try again.";
+      }
+
+      outputDiv.innerHTML = formatWithCopyButtons(finalOutput);
+      outputDiv.style.display = 'block';
+      spinner.style.display = 'none';
       btn.disabled = false;
-      btn.textContent = originalText;
     }
-  }
 
-  outputEl.scrollIntoView({ behavior: "smooth" });
-}
+    function formatWithCopyButtons(text) {
+      let html = `<div style="background:rgba(0,0,0,0.4); padding:18px; border-radius:14px;">${text}</div>`;
+      const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
+      parts.forEach((part, i) => {
+        const num = i + 1;
+        html += `<button onclick="copyPart(${num})" class="copy-btn">📋 Copy PART ${num}</button>`;
+      });
+      return html;
+    }
 
-async function copyOutput() {
-  if (!finalOutput) {
-    await generatePack();
-    return;
-  }
-  try {
-    await navigator.clipboard.writeText(finalOutput);
-    const status = document.getElementById("copyStatus");
-    if (status) status.style.display = "block";
-    setTimeout(() => { if (status) status.style.display = "none"; }, 2200);
-  } catch (e) {}
-}
-</script>
-  
+    function copyPart(num) {
+      const parts = finalOutput.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
+      if (parts[num-1]) {
+        let content = parts[num-1].replace(/^PART \d+:\s*/i, '').trim();
+        navigator.clipboard.writeText(content);
+        alert(`✅ PART ${num} Copied!`);
+      }
+    }
+
+    function copyOutput() {
+      if (finalOutput) {
+        navigator.clipboard.writeText(finalOutput);
+        alert("✅ Full Pack Copied!");
+      }
+    }
+  </script>
 </body>
 </html>
