@@ -78,7 +78,6 @@
     let imageBase64 = null;
     let imageMime = null;
 
-    // Image Preview
     document.getElementById('imageUpload').addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
@@ -123,7 +122,7 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ API failed. Please check your OpenAI key or try again.";
+        finalOutput = "❌ API failed. Please try again.";
       }
 
       outputDiv.innerHTML = formatWithCopyButtons(finalOutput);
@@ -145,7 +144,6 @@
     function copyPart(num) {
       const parts = finalOutput.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
       if (parts[num-1]) {
-        // Clean copy - remove "PART X: " header if needed, but keep content clean
         let content = parts[num-1].replace(/^PART \d+:\s*/i, '').trim();
         navigator.clipboard.writeText(content);
         alert(`✅ PART ${num} Content Copied!`);
