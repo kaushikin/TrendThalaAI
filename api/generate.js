@@ -1,71 +1,55 @@
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { topic, details, links, mood, figure, colors, effect, imageBase64, imageMime } = req.body || {};
 
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "OpenAI key missing" });
+  if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are **Trend Thala AI** — the #1 Tamil viral content expert for news, politics, cinema, and meme creators.
+  const systemPrompt = `You are **Trend Thala AI** — inspired by Mr. Tamilan style.
+Mr. Tamilan Style: Energetic Tamil voice-over, simple explanations, high curiosity, emotional hooks, clear storytelling for Tamil audience who want quick entertainment.
 
-**Core Rules:**
-- Always think like a top Tamil YouTube Shorts / Reels creator (think Mr. Tamilan, FactTamil, etc.)
-- Use powerful Tamil slang, emotional triggers, curiosity gaps, and FOMO.
-- Never hallucinate facts. Use only user-provided details + visible image context.
-- Make content highly shareable in Tamil Nadu / Tamil diaspora.
-- Output **EXACTLY** in the numbered PART format below. No extra text.
+**Tamil SEO Strategy:**
+- Use high-search Tamil + English mix keywords: "வைரல்", "பகிருங்கள்", "ஷாக்", "என்ன நடந்தது", "Full Explained", "Tamil Voice Over", "Mr Tamilan Style"
+- Clickbait + emotional + question titles
+- Add trending hashtags naturally
 
-**OUTPUT FORMAT (strict):**
+**Grok Video Rules:** Every scene maximum 6-10 seconds.
 
+Output **EXACTLY** in this format only:`;
+
+  const format = `
 PART 1: Image / Reference Analysis
-[If image uploaded: Describe key visuals, expressions, text, mood, colors seen]
+PART 2: Viral Tamil Content Pack (Mr.Tamilan Style)
+PART 3: YouTube Shorts Titles (3 powerful options with Tamil SEO)
+PART 4: YouTube Description (SEO optimized + keywords + hashtags)
+PART 5: Grok Image Generation Prompt (9:16 vertical, bold Tamil text)
+PART 6: Grok Text-to-Video Prompt (6-10s scenes only)
+PART 7: Grok Image-to-Video Prompt (if image given, 6-10s animation)
+PART 8: Tamil Voiceover Script (Mr.Tamilan energetic style)
+PART 9: Instagram Caption + Hashtags (Tamil SEO rich)
+PART 10: 5 Scene Breakdown (with timing)`;
 
-PART 2: Viral Tamil Content Pack
-[Short powerful summary + 5-7 key hooks]
-
-PART 3: YouTube Shorts Titles
-Option 1: [Most Clickbait]
-Option 2: [Emotional]
-Option 3: [Question Style]
-
-PART 4: YouTube Description
-[SEO optimized + timestamps if possible + call to action + hashtags]
-
-PART 5: Grok Image Generation Prompt
-[Ultra-detailed 9:16 vertical poster. Bold Tamil text, cinematic lighting, mood & effect mentioned. Ready to paste in Grok.]
-
-PART 6: Grok Text-to-Video Prompt
-[5 scenes × 8-10 seconds each. Fast cuts, Tamil text overlays, sound suggestions, vertical 9:16, high energy]
-
-PART 7: Grok Image-to-Video Prompt
-[If reference image given: "Start with this exact image and animate it..." + camera moves, zooms, text popups, transitions]
-
-PART 8: Tamil Voiceover Script
-[Natural, energetic Tamil script with emotion]
-
-PART 9: Instagram Caption + Hashtags
-[Short punchy caption + 12-15 trending hashtags]
-
-PART 10: 5 Scene Breakdown
-[Visual + Text Overlay for each scene]`;
-
-  let userContent = `Topic: ${topic || 'No topic given'}
-Key Details: ${details || 'None'}
-Source Links: ${links || 'None'}
+  let userContent = `Topic: ${topic || 'No topic'}
+Details: ${details || 'None'}
+Links: ${links || 'None'}
 Mood: ${mood || 'Dramatic'}
-Main Figure: ${figure || 'None'}
-Color Style: ${colors || 'Dark & Bold'}
-Visual Effect: ${effect || 'Cinematic Fire'}`;
+Figure: ${figure || 'None'}
+Colors: ${colors || 'Dark bold'}
+Effect: ${effect || 'Cinematic fire'}`;
 
-  let messages = [{ role: "system", content: systemPrompt }];
+  let messages = [{ role: "system", content: systemPrompt + format }];
 
   if (imageBase64 && imageMime) {
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\n\nAnalyze the uploaded reference image carefully and incorporate visible details." },
+        { type: "text", text: userContent + "\n\nAnalyze the reference image and use visual clues in Mr.Tamilan style." },
         { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
@@ -83,26 +67,18 @@ Visual Effect: ${effect || 'Cinematic Fire'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.85,
-        max_tokens: 3200
+        temperature: 0.82,
+        max_tokens: 3400
       })
     });
 
     const data = await response.json();
-    const fullContent = data.choices[0]?.message?.content || "Generation failed.";
+    const content = data.choices[0]?.message?.content || "Generation failed.";
 
-    // Smart extraction of Grok prompts
-    const grokImageMatch = fullContent.match(/PART 5: Grok Image Generation Prompt[\s\S]*?(?=PART 6:|$)/i);
-    const grokVideoMatch = fullContent.match(/PART 6: Grok Text-to-Video Prompt[\s\S]*?(?=PART 7:|$)/i);
-
-    res.json({
-      content: fullContent,
-      grokImagePrompt: grokImageMatch ? grokImageMatch[0].trim() : "Grok Image Prompt not found",
-      grokVideoPrompt: grokVideoMatch ? grokVideoMatch[0].trim() : "Grok Video Prompt not found"
-    });
+    res.json({ success: true, content });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "AI Generation failed" });
+    res.status(500).json({ success: false, error: 'AI error' });
   }
 };
