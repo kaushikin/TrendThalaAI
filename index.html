@@ -3,165 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trend Thala AI</title>
+  <title>Trend Thala AI - Mr Tamilan Style</title>
   <style>
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
+      margin: 0; font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #080812, #3b0764, #ff6a00);
-      color: white;
-      min-height: 100vh;
-      padding: 16px;
+      color: white; min-height: 100vh; padding: 16px;
     }
     .app { max-width: 560px; margin: 0 auto; padding-bottom: 60px; }
-    .hero {
-      text-align: center;
-      padding: 34px 20px 24px;
-      border-radius: 28px;
-      background: rgba(0,0,0,0.42);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-      backdrop-filter: blur(10px);
-      margin-bottom: 20px;
-    }
-    .logo {
-      width: 86px; height: 86px; margin: 0 auto 16px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, #ff6a00, #db2777, #7c3aed);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px; font-weight: 900; box-shadow: 0 15px 35px rgba(255,106,0,0.4);
-    }
-    h1 { margin: 0; font-size: 34px; }
-    .tagline { margin: 12px 0 0; font-size: 17px; color: #f4f4f5; line-height: 1.5; }
-    .card {
-      margin-top: 18px;
-      padding: 24px;
-      border-radius: 24px;
-      background: rgba(0,0,0,0.43);
-      box-shadow: 0 14px 35px rgba(0,0,0,0.3);
-      backdrop-filter: blur(8px);
-    }
-    .section-title { font-size: 24px; font-weight: 900; margin: 0 0 8px; }
-    label { display: block; font-size: 15px; font-weight: bold; margin: 16px 0 8px; }
-    input, textarea, select {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 15px;
-      font-size: 16px;
-      background: rgba(255,255,255,0.95);
-      color: #111;
-    }
-    textarea { min-height: 100px; resize: vertical; }
+    .hero { text-align: center; padding: 30px 20px; border-radius: 28px; background: rgba(0,0,0,0.45); margin-bottom: 20px; }
+    .logo { width: 90px; height: 90px; margin: 0 auto 12px; border-radius: 50%; background: linear-gradient(135deg, #ff6a00, #db2777); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; }
+    h1 { margin: 0; font-size: 32px; }
+    .tagline { font-size: 16px; color: #ddd; margin-top: 8px; }
+    .card { margin-top: 18px; padding: 24px; border-radius: 24px; background: rgba(0,0,0,0.45); }
+    label { display: block; font-weight: bold; margin: 16px 0 8px; font-size: 15px; }
+    input, textarea, select { width: 100%; padding: 14px; border-radius: 15px; border: none; font-size: 16px; background: #fff; color: #111; }
+    textarea { min-height: 100px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 16px;
-      padding: 16px;
-      margin: 12px 0 8px;
-      font-size: 17px;
-      font-weight: 900;
-      cursor: pointer;
-    }
+    .btn { width: 100%; padding: 16px; margin: 12px 0 8px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; }
     .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
     .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
-    .dark { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); }
-    .output {
-      margin-top: 20px;
-      background: rgba(0,0,0,0.4);
-      padding: 18px;
-      border-radius: 16px;
-      line-height: 1.65;
-      font-size: 15px;
-    }
-    .preview { max-width: 100%; border-radius: 16px; margin: 12px 0; border: 2px solid #ff6a00; }
-    button.copy-btn {
-      margin: 8px 4px;
-      padding: 12px 18px;
-      background: #22c55e;
-      color: black;
-      border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    @media (max-width: 480px) {
-      body { padding: 12px; }
-      h1 { font-size: 30px; }
-      .grid { grid-template-columns: 1fr; }
-    }
+    .output { margin-top: 20px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 16px; line-height: 1.7; font-size: 15.2px; white-space: pre-wrap; }
+    .preview { max-width: 100%; border-radius: 16px; margin: 12px 0; border: 3px solid #ff6a00; }
+    .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .copy-btn { margin: 8px 4px; padding: 11px 18px; background: #22c55e; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="app">
-    <!-- Hero -->
     <section class="hero">
-      <div class="logo">TT AI</div>
+      <div class="logo">TT</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">Mr. Tamilan Style Viral Content Generator<br>for Tamil YouTube Shorts & Reels</p>
+      <p class="tagline">Mr Tamilan Style • Tamil SEO • Viral Shorts</p>
     </section>
 
-    <!-- Main Card -->
     <section class="card">
       <div class="section-title">Create Viral Content Pack</div>
 
       <label>Topic / News Headline</label>
-      <input id="topic" placeholder="Example: Vijay latest political meeting creates huge buzz" />
+      <input id="topic" placeholder="Vijay TVK meeting creates huge buzz in Tamil Nadu" />
 
       <label>Key Details</label>
-      <textarea id="details" placeholder="Enter important points..."></textarea>
+      <textarea id="details" placeholder="Bullet points..."></textarea>
 
       <label>Source / Reference Links</label>
-      <textarea id="links" placeholder="https://...\nhttps://..."></textarea>
+      <textarea id="links" placeholder="https://..."></textarea>
 
-      <label>Reference Image (Optional - Vision Analysis)</label>
+      <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
-      <img id="imagePreview" class="preview" style="display: none;" alt="Preview" />
+      <img id="imagePreview" class="preview" style="display:none;" />
 
       <div class="grid">
-        <div>
-          <label>Mood</label>
-          <select id="mood">
-            <option>Dramatic</option>
-            <option>Shocking</option>
-            <option>Emotional</option>
-            <option>Angry</option>
-            <option>Funny</option>
-          </select>
-        </div>
-        <div>
-          <label>Main Figure</label>
-          <input id="figure" placeholder="Vijay / Modi / Actor Name" />
-        </div>
+        <div><label>Mood</label><select id="mood"><option>Dramatic</option><option>Shocking</option><option>Emotional</option><option>Angry</option><option>Funny</option></select></div>
+        <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
       </div>
 
       <div class="grid">
-        <div>
-          <label>Color Style</label>
-          <select id="colors">
-            <option>Dark political</option>
-            <option>Saffron red</option>
-            <option>Neon meme</option>
-            <option>Blue serious</option>
-          </select>
-        </div>
-        <div>
-          <label>Visual Effect</label>
-          <select id="effect">
-            <option>Fire</option>
-            <option>Lightning</option>
-            <option>Glitch</option>
-            <option>Cinematic</option>
-          </select>
-        </div>
+        <div><label>Color Style</label><select id="colors"><option>Dark political</option><option>Saffron red</option><option>Neon</option></select></div>
+        <div><label>Effect</label><select id="effect"><option>Fire</option><option>Lightning</option><option>Cinematic</option></select></div>
       </div>
 
-      <button class="btn primary" onclick="generatePack()">🤖 Generate AI Content Pack</button>
+      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Mr Tamilan Style Pack</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
-    </section>
 
-    <div id="output" class="output" style="display: none;"></div>
+      <div class="spinner" id="spinner"></div>
+      <div id="output" class="output" style="display:none;"></div>
+    </section>
   </div>
 
   <script>
@@ -169,12 +78,12 @@
     let imageBase64 = null;
     let imageMime = null;
 
-    // Image Upload Handler
-    document.getElementById('imageUpload').addEventListener('change', function(e) {
+    // Image Preview
+    document.getElementById('imageUpload').addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(ev) {
+      reader.onload = ev => {
         imageBase64 = ev.target.result.split(',')[1];
         imageMime = file.type;
         const preview = document.getElementById('imagePreview');
@@ -185,10 +94,13 @@
     });
 
     async function generatePack() {
-      const btn = document.querySelector('.primary');
-      const originalText = btn.textContent;
-      btn.textContent = 'Generating Mr.Tamilan Style...';
+      const btn = document.getElementById('generateBtn');
+      const spinner = document.getElementById('spinner');
+      const outputDiv = document.getElementById('output');
+
       btn.disabled = true;
+      spinner.style.display = 'block';
+      outputDiv.style.display = 'none';
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -211,45 +123,39 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ API failed. Please try again.";
+        finalOutput = "❌ API failed. Please check your OpenAI key or try again.";
       }
 
-      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
-      document.getElementById('output').style.display = 'block';
-
-      btn.textContent = originalText;
+      outputDiv.innerHTML = formatWithCopyButtons(finalOutput);
+      outputDiv.style.display = 'block';
+      spinner.style.display = 'none';
       btn.disabled = false;
     }
 
     function formatWithCopyButtons(text) {
-      let html = `<div style="white-space: pre-wrap; background: rgba(0,0,0,0.45); padding: 20px; border-radius: 16px; line-height: 1.7;">${text}</div>`;
-
+      let html = `<div style="background:rgba(0,0,0,0.4);padding:18px;border-radius:14px;">${text}</div>`;
       const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
       parts.forEach((part, i) => {
         const num = i + 1;
-        html += `
-          <button onclick="copyPart(${num})" class="copy-btn">
-            📋 Copy PART ${num}
-          </button>`;
+        html += `<button onclick="copyPart(${num})" class="copy-btn">📋 Copy PART ${num}</button>`;
       });
-
       return html;
     }
 
     function copyPart(num) {
       const parts = finalOutput.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
       if (parts[num-1]) {
-        navigator.clipboard.writeText(parts[num-1].trim());
-        alert(`✅ PART ${num} Copied!`);
+        // Clean copy - remove "PART X: " header if needed, but keep content clean
+        let content = parts[num-1].replace(/^PART \d+:\s*/i, '').trim();
+        navigator.clipboard.writeText(content);
+        alert(`✅ PART ${num} Content Copied!`);
       }
     }
 
     function copyOutput() {
       if (finalOutput) {
         navigator.clipboard.writeText(finalOutput);
-        alert("✅ Full Content Pack Copied!");
-      } else {
-        alert("Generate content first!");
+        alert("✅ Full Pack Copied!");
       }
     }
   </script>
