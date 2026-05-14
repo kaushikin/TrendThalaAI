@@ -6,50 +6,56 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { topic, details, links, mood, figure, colors, effect, imageBase64, imageMime } = req.body || {};
+  const { topic, details, links, custom, mood, figure, imageBase64, imageMime } = req.body || {};
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are **Trend Thala AI** — inspired by Mr. Tamilan style.
-Mr. Tamilan Style: Energetic Tamil voice-over, simple explanations, high curiosity, emotional hooks, clear storytelling for Tamil audience who want quick entertainment.
+  const systemPrompt = `You are **Trend Thala AI** — Specialist in Mr Tamilan Style YouTube Shorts.
 
-**Tamil SEO Strategy:**
-- Use high-search Tamil + English mix keywords: "வைரல்", "பகிருங்கள்", "ஷாக்", "என்ன நடந்தது", "Full Explained", "Tamil Voice Over", "Mr Tamilan Style"
-- Clickbait + emotional + question titles
-- Add trending hashtags naturally
+**Mr Tamilan Viral Hook Formulas:**
+- Strong curiosity hooks: "என்ன நடந்தது?", "அப்பப்பா இது!", "Shock ஆகிடுவீங்க!", "இது உங்களுக்கு தெரியுமா?"
+- Emotional + Dramatic + Fast storytelling
+- Always 15-60 seconds Shorts friendly
 
-**Grok Video Rules:** Every scene maximum 6-10 seconds.
+**CapCut Editing Style:**
+- Fast cuts (every 4-8 seconds)
+- Big bold Tamil text with zoom & animation
+- Trending transitions, fire, lightning, beat sync
+
+**Important Rules:**
+- Strictly follow Custom Instructions (if user says "No voice over", completely remove PART 8)
+- Focus only on YouTube Shorts
+- Use strong Tamil SEO keywords
 
 Output **EXACTLY** in this format only:`;
 
-  const format = `
+  const outputFormat = `
 PART 1: Image / Reference Analysis
-PART 2: Viral Tamil Content Pack (Mr.Tamilan Style)
-PART 3: YouTube Shorts Titles (3 powerful options with Tamil SEO)
-PART 4: YouTube Description (SEO optimized + keywords + hashtags)
-PART 5: Grok Image Generation Prompt (9:16 vertical, bold Tamil text)
-PART 6: Grok Text-to-Video Prompt (6-10s scenes only)
-PART 7: Grok Image-to-Video Prompt (if image given, 6-10s animation)
-PART 8: Tamil Voiceover Script (Mr.Tamilan energetic style)
-PART 9: Instagram Caption + Hashtags (Tamil SEO rich)
-PART 10: 5 Scene Breakdown (with timing)`;
+PART 2: Viral Hook (First 3-5 seconds)
+PART 3: YouTube Shorts Titles (3 Super Clickbait)
+PART 4: Full Shorts Content Flow / Script
+PART 5: Grok Image Generation Prompt (9:16)
+PART 6: Grok Text-to-Video Prompt (6-10s scenes)
+PART 7: Grok Image-to-Video Prompt
+PART 8: Tamil Voiceover Script (Mr Tamilan Style) - Skip if custom says no voice over
+PART 9: CapCut Editing Template Suggestions
+PART 10: Hashtags & SEO Keywords`;
 
   let userContent = `Topic: ${topic || 'No topic'}
 Details: ${details || 'None'}
 Links: ${links || 'None'}
 Mood: ${mood || 'Dramatic'}
 Figure: ${figure || 'None'}
-Colors: ${colors || 'Dark bold'}
-Effect: ${effect || 'Cinematic fire'}`;
+Custom Instructions: ${custom || 'None'}`;
 
-  let messages = [{ role: "system", content: systemPrompt + format }];
+  let messages = [{ role: "system", content: systemPrompt + outputFormat }];
 
   if (imageBase64 && imageMime) {
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\n\nAnalyze the reference image and use visual clues in Mr.Tamilan style." },
+        { type: "text", text: userContent + "\nAnalyze image and generate in Mr Tamilan Shorts style." },
         { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
@@ -67,8 +73,8 @@ Effect: ${effect || 'Cinematic fire'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.82,
-        max_tokens: 3400
+        temperature: 0.88,
+        max_tokens: 3200
       })
     });
 
@@ -79,6 +85,6 @@ Effect: ${effect || 'Cinematic fire'}`;
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: 'AI error' });
+    res.status(500).json({ success: false, error: 'Generation failed' });
   }
 };
