@@ -1,88 +1,257 @@
-<script>
-  let finalOutput = "";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trend Thala AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #080812, #3b0764, #ff6a00);
+      color: white;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .app { max-width: 560px; margin: 0 auto; padding-bottom: 60px; }
+    .hero {
+      text-align: center;
+      padding: 34px 20px 24px;
+      border-radius: 28px;
+      background: rgba(0,0,0,0.42);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      margin-bottom: 20px;
+    }
+    .logo {
+      width: 86px; height: 86px; margin: 0 auto 16px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #ff6a00, #db2777, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 900; box-shadow: 0 15px 35px rgba(255,106,0,0.4);
+    }
+    h1 { margin: 0; font-size: 34px; }
+    .tagline { margin: 12px 0 0; font-size: 17px; color: #f4f4f5; line-height: 1.5; }
+    .card {
+      margin-top: 18px;
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(0,0,0,0.43);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+    }
+    .section-title { font-size: 24px; font-weight: 900; margin: 0 0 8px; }
+    label { display: block; font-size: 15px; font-weight: bold; margin: 16px 0 8px; }
+    input, textarea, select {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 15px;
+      font-size: 16px;
+      background: rgba(255,255,255,0.95);
+      color: #111;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 12px 0 8px;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
+    .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
+    .dark { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); }
+    .output {
+      margin-top: 20px;
+      background: rgba(0,0,0,0.4);
+      padding: 18px;
+      border-radius: 16px;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+    .preview { max-width: 100%; border-radius: 16px; margin: 12px 0; border: 2px solid #ff6a00; }
+    button.copy-btn {
+      margin: 8px 4px;
+      padding: 12px 18px;
+      background: #22c55e;
+      color: black;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      h1 { font-size: 30px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="logo">TT AI</div>
+      <h1>Trend Thala AI</h1>
+      <p class="tagline">Mr. Tamilan Style Viral Content Generator<br>for Tamil YouTube Shorts & Reels</p>
+    </section>
 
-  // Image Upload
-  const imageUpload = document.getElementById('imageUpload');
-  if (imageUpload) {
-    imageUpload.addEventListener('change', e => {
+    <!-- Main Card -->
+    <section class="card">
+      <div class="section-title">Create Viral Content Pack</div>
+
+      <label>Topic / News Headline</label>
+      <input id="topic" placeholder="Example: Vijay latest political meeting creates huge buzz" />
+
+      <label>Key Details</label>
+      <textarea id="details" placeholder="Enter important points..."></textarea>
+
+      <label>Source / Reference Links</label>
+      <textarea id="links" placeholder="https://...\nhttps://..."></textarea>
+
+      <label>Reference Image (Optional - Vision Analysis)</label>
+      <input type="file" id="imageUpload" accept="image/*" />
+      <img id="imagePreview" class="preview" style="display: none;" alt="Preview" />
+
+      <div class="grid">
+        <div>
+          <label>Mood</label>
+          <select id="mood">
+            <option>Dramatic</option>
+            <option>Shocking</option>
+            <option>Emotional</option>
+            <option>Angry</option>
+            <option>Funny</option>
+          </select>
+        </div>
+        <div>
+          <label>Main Figure</label>
+          <input id="figure" placeholder="Vijay / Modi / Actor Name" />
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>Color Style</label>
+          <select id="colors">
+            <option>Dark political</option>
+            <option>Saffron red</option>
+            <option>Neon meme</option>
+            <option>Blue serious</option>
+          </select>
+        </div>
+        <div>
+          <label>Visual Effect</label>
+          <select id="effect">
+            <option>Fire</option>
+            <option>Lightning</option>
+            <option>Glitch</option>
+            <option>Cinematic</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn primary" onclick="generatePack()">🤖 Generate AI Content Pack</button>
+      <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
+    </section>
+
+    <div id="output" class="output" style="display: none;"></div>
+  </div>
+
+  <script>
+    let finalOutput = "";
+    let imageBase64 = null;
+    let imageMime = null;
+
+    // Image Upload Handler
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = ev => {
-        window.imageBase64 = ev.target.result.split(',')[1];
-        window.imageMime = file.type;
+      reader.onload = function(ev) {
+        imageBase64 = ev.target.result.split(',')[1];
+        imageMime = file.type;
         const preview = document.getElementById('imagePreview');
-        if (preview) {
-          preview.src = ev.target.result;
-          preview.style.display = 'block';
-        }
+        preview.src = ev.target.result;
+        preview.style.display = 'block';
       };
       reader.readAsDataURL(file);
     });
-  }
 
-  async function generatePack() {
-    const btn = document.querySelector('.primary');
-    const originalText = btn.textContent;
-    btn.textContent = '🤖 Generating Mr.Tamilan Style...';
-    btn.disabled = true;
+    async function generatePack() {
+      const btn = document.querySelector('.primary');
+      const originalText = btn.textContent;
+      btn.textContent = 'Generating Mr.Tamilan Style...';
+      btn.disabled = true;
 
-    const data = {
-      topic: document.getElementById('topic').value.trim(),
-      details: document.getElementById('details').value.trim(),
-      links: document.getElementById('links')?.value.trim() || '',
-      mood: document.getElementById('mood').value,
-      figure: document.getElementById('figure').value.trim(),
-      colors: document.getElementById('colors').value,
-      effect: document.getElementById('effect').value,
-      imageBase64: window.imageBase64 || null,
-      imageMime: window.imageMime || null
-    };
+      const data = {
+        topic: document.getElementById('topic').value.trim(),
+        details: document.getElementById('details').value.trim(),
+        links: document.getElementById('links').value.trim(),
+        mood: document.getElementById('mood').value,
+        figure: document.getElementById('figure').value.trim(),
+        colors: document.getElementById('colors').value,
+        effect: document.getElementById('effect').value,
+        imageBase64: imageBase64,
+        imageMime: imageMime
+      };
 
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        finalOutput = result.content || "Generation completed.";
+      } catch (e) {
+        finalOutput = "❌ API failed. Please try again.";
+      }
+
+      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
+      document.getElementById('output').style.display = 'block';
+
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+
+    function formatWithCopyButtons(text) {
+      let html = `<div style="white-space: pre-wrap; background: rgba(0,0,0,0.45); padding: 20px; border-radius: 16px; line-height: 1.7;">${text}</div>`;
+
+      const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
+      parts.forEach((part, i) => {
+        const num = i + 1;
+        html += `
+          <button onclick="copyPart(${num})" class="copy-btn">
+            📋 Copy PART ${num}
+          </button>`;
       });
-      const result = await res.json();
-      finalOutput = result.content || "Generation completed.";
-    } catch (e) {
-      finalOutput = "API failed. Please try again later.";
+
+      return html;
     }
 
-    document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
-    document.getElementById('output').style.display = 'block';
-
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-
-  function formatWithCopyButtons(text) {
-    let html = `<div style="background:rgba(0,0,0,0.4); padding:18px; border-radius:16px; white-space:pre-wrap; font-size:15px; line-height:1.65;">${text}</div>`;
-
-    const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
-    parts.forEach((part, i) => {
-      const num = i + 1;
-      html += `
-        <button onclick="copyPart(${num})" style="margin:8px 4px; padding:12px 20px; background:#22c55e; color:#000; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">
-          📋 Copy PART ${num}
-        </button>`;
-    });
-
-    return html;
-  }
-
-  function copyPart(num) {
-    const parts = finalOutput.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
-    if (parts[num-1]) {
-      navigator.clipboard.writeText(parts[num-1].trim());
-      alert(`✅ PART ${num} Copied!`);
+    function copyPart(num) {
+      const parts = finalOutput.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
+      if (parts[num-1]) {
+        navigator.clipboard.writeText(parts[num-1].trim());
+        alert(`✅ PART ${num} Copied!`);
+      }
     }
-  }
 
-  function copyOutput() {
-    navigator.clipboard.writeText(finalOutput);
-    alert("✅ Full Content Pack Copied!");
-  }
-</script>
+    function copyOutput() {
+      if (finalOutput) {
+        navigator.clipboard.writeText(finalOutput);
+        alert("✅ Full Content Pack Copied!");
+      } else {
+        alert("Generate content first!");
+      }
+    }
+  </script>
+</body>
+</html>
