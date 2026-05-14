@@ -19,24 +19,16 @@
     .badge-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
     .badge { padding: 9px 12px; background: rgba(255,255,255,0.13); border-radius: 999px; font-size: 13px; font-weight: bold; }
     .card { margin-top: 18px; padding: 22px; border-radius: 24px; background: rgba(0,0,0,0.43); box-shadow: 0 14px 35px rgba(0,0,0,0.28); backdrop-filter: blur(8px); }
-    .section-title { font-size: 23px; font-weight: 900; margin: 0 0 8px; }
-    .section-subtitle { margin: 0 0 18px; color: #e5e7eb; font-size: 15px; line-height: 1.5; }
     label { display: block; font-size: 15px; font-weight: bold; margin: 15px 0 8px; }
     input, textarea, select { width: 100%; border: none; outline: none; padding: 15px; border-radius: 15px; font-size: 16px; background: rgba(255,255,255,0.95); color: #111827; }
-    textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+    textarea { min-height: 90px; resize: vertical; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .btn { width: 100%; border: none; border-radius: 16px; padding: 16px 18px; margin-top: 16px; color: white; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .btn { width: 100%; border: none; border-radius: 16px; padding: 16px 18px; margin-top: 12px; color: white; font-size: 17px; font-weight: 900; cursor: pointer; }
     .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
     .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
     .dark { background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.18); }
-    .output { white-space: pre-wrap; word-break: break-word; background: rgba(0,0,0,0.35); color: #f8fafc; padding: 16px; border-radius: 16px; font-size: 14.5px; line-height: 1.55; margin-top: 14px; display: none; text-align: left; }
-    .copy-status { display: none; margin-top: 12px; color: #86efac; font-weight: bold; text-align: center; }
+    .output { white-space: pre-wrap; background: rgba(0,0,0,0.35); padding: 18px; border-radius: 16px; line-height: 1.6; font-size: 15px; margin-top: 10px; }
     .preview { max-width: 100%; border-radius: 16px; margin: 10px 0; border: 2px solid #ff6a00; }
-    @media (max-width: 430px) {
-      body { padding: 14px; }
-      h1 { font-size: 32px; }
-      .grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
@@ -44,17 +36,11 @@
     <section class="hero">
       <div class="logo">TT AI</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">Tamil creators-க்கான AI content factory.<br>News, Shorts, Reels, captions, poster & Grok prompts — ஒரே இடத்தில்.</p>
-      <div class="badge-row">
-        <div class="badge">Tamil News</div>
-        <div class="badge">Grok Prompts</div>
-        <div class="badge">Vision AI</div>
-      </div>
+      <p class="tagline">Tamil creators-க்கான AI content factory</p>
     </section>
 
     <section class="card">
       <div class="section-title">Create Viral Content Pack</div>
-      <p class="section-subtitle">Advanced inputs + Reference Image + Grok Prompts</p>
 
       <label>Topic / News Headline</label>
       <input id="topic" placeholder="Example: Vijay political meeting creates buzz" />
@@ -63,148 +49,89 @@
       <textarea id="details" placeholder="Bullet points..."></textarea>
 
       <label>Source / Reference Links</label>
-      <textarea id="links" placeholder="https://...&#10;https://..."></textarea>
+      <textarea id="links" placeholder="https://...\nhttps://..."></textarea>
 
-      <label>Reference Image (Optional - Vision Analysis)</label>
+      <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
-      <img id="imagePreview" class="preview" alt="Reference Preview" style="display:none;" />
+      <img id="imagePreview" class="preview" style="display:none;" />
 
       <div class="grid">
-        <div>
-          <label>Mood</label>
-          <select id="mood">
-            <option>Dramatic</option><option>Shocking</option><option>Funny</option><option>Emotional</option><option>Action</option>
-          </select>
-        </div>
-        <div>
-          <label>Main Figure</label>
-          <input id="figure" placeholder="Vijay / Modi / None" />
-        </div>
+        <div><label>Mood</label><select id="mood"><option>Dramatic</option><option>Shocking</option><option>Emotional</option><option>Angry</option><option>Funny</option></select></div>
+        <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
       </div>
 
       <div class="grid">
-        <div>
-          <label>Color Style</label>
-          <select id="colors">
-            <option>Dark political</option><option>Saffron-red</option><option>Neon meme</option><option>Blue serious</option>
-          </select>
-        </div>
-        <div>
-          <label>Effect</label>
-          <select id="effect">
-            <option>Fire</option><option>Glitch</option><option>Lightning</option><option>Smoke</option><option>Clean</option>
-          </select>
-        </div>
+        <div><label>Color Style</label><select id="colors"><option>Dark political</option><option>Saffron red</option><option>Neon</option><option>Blue serious</option></select></div>
+        <div><label>Effect</label><select id="effect"><option>Fire</option><option>Lightning</option><option>Glitch</option><option>Smoke</option><option>Cinematic</option></select></div>
       </div>
 
       <button class="btn primary" onclick="generatePack()">Generate AI Content Pack</button>
       <button class="btn secondary" onclick="copyOutput()">Copy Full Pack</button>
-      <button class="btn dark" onclick="copyGrokImagePrompt()">Copy Grok Image Prompt</button>
-      <button class="btn dark" onclick="copyGrokVideoPrompt()">Copy Grok Video Prompt</button>
+      <button class="btn dark" onclick="copyGrokImage()">Copy Grok Image Prompt</button>
+      <button class="btn dark" onclick="copyGrokVideo()">Copy Grok Video Prompt</button>
 
-      <div id="copyStatus" class="copy-status"></div>
       <div id="output" class="output"></div>
     </section>
-
-    <!-- Keep your existing "What You Can Create" and "Follow & Updates" sections as-is -->
-    <section class="card">
-      <div class="section-title">What You Can Create</div>
-      <!-- ... your existing feature list ... -->
-    </section>
-
-    <section class="card">
-      <div class="section-title">Follow & Updates</div>
-      <!-- ... your existing social buttons ... -->
-    </section>
-
-    <div class="footer">Trend Thala AI © 2026</div>
   </div>
 
   <script>
     let finalOutput = "";
-    let grokImagePromptText = "";
-    let grokVideoPromptText = "";
+    let grokImageP = "";
+    let grokVideoP = "";
     let imageBase64 = null;
     let imageMime = null;
 
-    // Image Preview + Base64
-    document.getElementById('imageUpload').addEventListener('change', function(e) {
+    document.getElementById('imageUpload').addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(ev) {
+      reader.onload = ev => {
         imageBase64 = ev.target.result.split(',')[1];
         imageMime = file.type;
-        const preview = document.getElementById('imagePreview');
-        preview.src = ev.target.result;
-        preview.style.display = 'block';
+        document.getElementById('imagePreview').src = ev.target.result;
+        document.getElementById('imagePreview').style.display = 'block';
       };
       reader.readAsDataURL(file);
     });
 
     async function generatePack() {
       const btn = document.querySelector('.primary');
-      const originalText = btn.textContent;
-      btn.textContent = '🤖 Generating with GPT-4o Vision...';
+      btn.textContent = 'Generating...';
       btn.disabled = true;
 
       const data = {
-        topic: document.getElementById('topic').value.trim(),
-        details: document.getElementById('details').value.trim(),
-        links: document.getElementById('links').value.trim(),
+        topic: document.getElementById('topic').value,
+        details: document.getElementById('details').value,
+        links: document.getElementById('links').value,
         mood: document.getElementById('mood').value,
-        figure: document.getElementById('figure').value.trim(),
+        figure: document.getElementById('figure').value,
         colors: document.getElementById('colors').value,
         effect: document.getElementById('effect').value,
-        imageBase64: imageBase64,
-        imageMime: imageMime
+        imageBase64, imageMime
       };
 
       try {
         const res = await fetch('/api/generate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(data)
         });
-
         const result = await res.json();
-        finalOutput = result.content || "✅ Generation completed!";
-        grokImagePromptText = result.grokImagePrompt || "";
-        grokVideoPromptText = result.grokVideoPrompt || "";
-      } catch (e) {
-        // Local fallback (your existing one)
-        finalOutput = "API failed. Using local fallback...";
-        grokImagePromptText = grokVideoPromptText = "";
+        finalOutput = result.content;
+        grokImageP = result.grokImagePrompt;
+        grokVideoP = result.grokVideoPrompt;
+      } catch(e) {
+        finalOutput = "API error. Please try again.";
       }
 
       document.getElementById('output').innerText = finalOutput;
-      document.getElementById('output').style.display = 'block';
-
-      btn.textContent = originalText;
+      btn.textContent = 'Generate AI Content Pack';
       btn.disabled = false;
     }
 
-    function copyOutput() {
-      navigator.clipboard.writeText(finalOutput);
-      showCopyStatus("Full Pack Copied ✅");
-    }
-
-    function copyGrokImagePrompt() {
-      navigator.clipboard.writeText(grokImagePromptText || "Generate first to get Grok Image Prompt");
-      showCopyStatus("Grok Image Prompt Copied ✅");
-    }
-
-    function copyGrokVideoPrompt() {
-      navigator.clipboard.writeText(grokVideoPromptText || "Generate first to get Grok Video Prompt");
-      showCopyStatus("Grok Video Prompt Copied ✅");
-    }
-
-    function showCopyStatus(msg) {
-      const status = document.getElementById('copyStatus');
-      status.textContent = msg;
-      status.style.display = 'block';
-      setTimeout(() => status.style.display = 'none', 2500);
-    }
+    function copyOutput() { navigator.clipboard.writeText(finalOutput); alert("Full Pack Copied!"); }
+    function copyGrokImage() { navigator.clipboard.writeText(grokImageP); alert("Grok Image Prompt Copied!"); }
+    function copyGrokVideo() { navigator.clipboard.writeText(grokVideoP); alert("Grok Video Prompt Copied!"); }
   </script>
 </body>
 </html>
