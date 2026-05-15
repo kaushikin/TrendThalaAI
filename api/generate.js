@@ -13,35 +13,35 @@ module.exports = async (req, res) => {
 
   const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
 
-**Voiceover Rule:**
-- PART 9 Voiceover Script must be **fully in Tamil language** (pure Tamil, natural spoken style)
-- Use energetic Mr Tamilan tone: அப்பப்பா, என்னடா, Machi, Shock ஆகிடுவீங்க, etc.
-- Keep other parts with natural Tamil + English mix where needed.
+**Best Free / Open Tamil TTS Tools:**
+- **k2-fsa/OmniVoice** → Excellent multilingual + voice cloning
+- **ai4bharat/indic-parler-tts** → Best natural Tamil + English code-switching
+- CapCut built-in Tamil voices
 
-**TTS Recommendation:** ai4bharat/indic-parler-tts (Best for pure Tamil)
+**Voiceover Style:** Energetic, dramatic, natural spoken Tamil with some English words.
 
 Output **EXACTLY** in this format:`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis
+PART 1: Image / Reference Analysis (Detailed visual + meme potential)
 
-PART 2: Viral Hook
+PART 2: Viral Hook (3-5 seconds)
 
-PART 3: YouTube Shorts Titles (3 Best)
+PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
 
-PART 4: YouTube Shorts Description
+PART 4: YouTube Shorts Description (SEO + CTA)
 
-PART 5: Full Shorts Script (Natural mix)
+PART 5: Full Shorts Script (Natural Tamil-English mix)
 
-PART 6: Grok Image Generation Prompt
+PART 6: Grok Image Generation Prompt (9:16 vertical)
 
-PART 7: Grok Text-to-Video Prompt
+PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Script (Pure Tamil)
+PART 9: Voiceover Script (Pure Tamil - TTS Ready)
 
-PART 10: Instagram Caption + 5 Hashtags
+PART 10: Instagram Caption + 5 Best Hashtags
 
 PART 11: CapCut Editing Suggestions`;
 
@@ -76,7 +76,7 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.92,
+        temperature: 0.93,
         max_tokens: 4000
       })
     });
