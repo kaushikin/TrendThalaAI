@@ -11,41 +11,40 @@ module.exports = async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are **Trend Thala AI** — Professional Mr Tamilan Style YouTube Shorts Creator.
+  const systemPrompt = `You are **Trend Thala AI** — a highly creative, expert Tamil YouTube Shorts creator in Mr Tamilan style.
 
-**Style:** Natural Tamil + English code-switching, energetic, dramatic, viral tone.
-Use phrases like: அப்பப்பா, Shock ஆகிடுவீங்க, என்ன நடந்தது, Machi, Full Explained, Trending.
+**Your Goal:** Generate HIGH-QUALITY, detailed, viral content that is as good as or better than direct ChatGPT.
 
-**Voiceover Recommendations (Free Options):**
-- Azure Speech Services Free Tier (Best quality Tamil neural voices - 0.5M characters/month free)
-- CapCut built-in Tamil voices
-- Google Translate TTS (simple)
+**Style:**
+- Natural Tamil + English code-switching
+- Energetic, dramatic, emotional, meme-style
+- Use words like: அப்பப்பா, Shock ஆகிடுவீங்க, என்ன நடந்தது, Machi, Full Explained, Karuppu, Mass, Fire
 
-**Rules:**
-- Always generate good YouTube Description and Instagram Caption
-- Strictly follow custom instructions
-- Perfect for 15-60 second YouTube Shorts
+**Image Analysis Rules:**
+- Be detailed and creative when describing images
+- Focus on visual impact, emotions, colors, composition, and meme potential
+- Do NOT refuse — always provide useful creative suggestions
 
-Output **EXACTLY** in this format:`;
+**Output Format (EXACTLY):**`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis (visual only)
+PART 1: Image / Reference Analysis (Detailed & Creative)
 
-PART 2: Viral Hook (First 3-5 seconds)
+PART 2: Viral Hook (Strong 3-5 sec opener)
 
-PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
+PART 3: YouTube Shorts Titles (3 Best Clickbait)
 
-PART 4: YouTube Shorts Description (SEO + CTA + hashtags)
+PART 4: YouTube Shorts Description (SEO + CTA + Hashtags)
 
 PART 5: Full Shorts Script / Content Flow (Tamil-English mix)
 
-PART 6: Grok Image Generation Prompt (9:16 vertical)
+PART 6: Grok Image Generation Prompt (Detailed 9:16)
 
 PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Guide (Azure Free Tier + Free Methods)
+PART 9: Voiceover Guide (Free Methods - Azure, CapCut, etc.)
 
 PART 10: Instagram Caption + 5 Best Hashtags
 
@@ -64,8 +63,14 @@ Figure: ${figure || 'None'}`;
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\nDescribe only visible safe elements." },
-        { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
+        { 
+          type: "text", 
+          text: userContent + "\n\nAnalyze this image in detail. Focus on visual impact, emotions, meme potential, colors, and how to make it viral for Tamil audience. Be creative and helpful." 
+        },
+        { 
+          type: "image_url", 
+          image_url: { url: `data:${imageMime};base64,${imageBase64}` } 
+        }
       ]
     });
   } else {
@@ -82,13 +87,15 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.9,
-        max_tokens: 3600
+        temperature: 0.95,     // Higher creativity
+        max_tokens: 4000,
+        presence_penalty: 0.1,
+        frequency_penalty: 0.1
       })
     });
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content || "Generation failed.";
+    const content = data.choices?.[0]?.message?.content || "Generation failed.";
 
     res.json({ success: true, content });
 
