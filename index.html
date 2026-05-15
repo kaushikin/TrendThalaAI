@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trend Thala AI - Shorts Only</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -62,6 +63,9 @@
           <button class="preset-btn" onclick="useTemplate('politics')">🗳️ Political News</button>
           <button class="preset-btn" onclick="useTemplate('gossip')">🎥 Cinema Gossip</button>
           <button class="preset-btn" onclick="useTemplate('success')">🏆 Success Story</button>
+          <button class="preset-btn" onclick="useTemplate('cricket')">🏏 Cricket Update</button>
+          <button class="preset-btn" onclick="useTemplate('tech')">💻 Tech News</button>
+          <button class="preset-btn" onclick="useTemplate('motivational')">🔥 Motivational</button>
         </div>
       </div>
 
@@ -80,6 +84,7 @@
       <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
       <img id="imagePreview" class="preview" style="display:none;" />
+      <div id="imageCategory" style="margin-top: 8px; font-size: 13px; color: #22c55e;"></div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div><label>Mood</label><select id="mood"><option>Dramatic</option><option>Shocking</option><option>Emotional</option><option>Angry</option><option>Funny</option></select></div>
@@ -89,6 +94,7 @@
       <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral Shorts Pack</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
       <button class="btn voice-btn" onclick="downloadVoiceover()" id="voiceBtn" style="display:none;">🎤 Download Tamil Voiceover</button>
+      <button class="btn" style="background: #3b82f6; margin-top: 8px;" onclick="exportAsPDF()">📄 Export as PDF</button>
 
       <div class="spinner" id="spinner"></div>
       <div id="output" class="output" style="display:none;"></div>
@@ -111,12 +117,11 @@
 
       <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px; margin-bottom: 12px; font-size: 14px;">
         <strong>How to get YOUR voice in clips:</strong><br><br>
-        1. Click "Record My Voice" and speak naturally in Tamil (5-10 sec)<br>
-        2. Download your voice sample<br>
+        1. Record 5-10 sec of your voice<br>
+        2. Download voice sample<br>
         3. Go to <a href="https://huggingface.co/spaces/k2-fsa/OmniVoice" target="_blank" style="color: #22c55e;">OmniVoice Demo</a><br>
-        4. Upload your voice sample + paste Tamil script from PART 9<br>
-        5. Generate → Your voice will speak the full script!<br><br>
-        <strong>Tip:</strong> Speak with your normal Mr Tamilan energy for best results.
+        4. Upload voice + paste Tamil script from PART 9<br>
+        5. Generate → Your voice speaks the full script!
       </div>
 
       <button class="btn" style="background: #22c55e; color: black;" onclick="prepareForOmniVoice()">
@@ -149,18 +154,62 @@
       } else if (type === 'success') {
         topic.value = "Small town girl becomes Tamil cinema sensation";
         details.value = "From village to silver screen success story\nHer journey inspires millions\nNow getting offers from top directors";
+      } else if (type === 'cricket') {
+        topic.value = "MS Dhoni's new record creates history";
+        details.value = "Dhoni breaks another record in IPL\nFans go crazy in stadium\nCSK celebrates historic win";
+      } else if (type === 'tech') {
+        topic.value = "Tamil Nadu startup gets $100 million funding";
+        details.value = "Chennai-based startup becomes unicorn\nAI product goes global\nFounder shares success story";
+      } else if (type === 'motivational') {
+        topic.value = "From daily wage worker to IAS officer";
+        details.value = "Inspiring journey of determination\nCleared UPSC in first attempt\nNow inspiring millions of youth";
       }
     }
 
-    document.getElementById('imageUpload').addEventListener('change', e => {
+    // Image Upload + Auto Category Detection
+    document.getElementById('imageUpload').addEventListener('change', async e => {
       const file = e.target.files[0];
       if (!file) return;
+      
       const reader = new FileReader();
-      reader.onload = ev => {
+      reader.onload = async ev => {
         imageBase64 = ev.target.result.split(',')[1];
         imageMime = file.type;
         document.getElementById('imagePreview').src = ev.target.result;
         document.getElementById('imagePreview').style.display = 'block';
+        
+        // Auto-detect category using backend
+        try {
+          const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              topic: "Analyze this image and suggest category",
+              details: "",
+              links: "",
+              custom: "Just tell me the category: Politics, Movie, Gossip, Cricket, Tech, Motivational, or Other",
+              mood: "Dramatic",
+              figure: "",
+              imageBase64: imageBase64,
+              imageMime: imageMime
+            })
+          });
+          const result = await res.json();
+          const content = result.content || "";
+          
+          // Simple detection
+          let category = "Other";
+          if (content.toLowerCase().includes("politics") || content.toLowerCase().includes("vijay") || content.toLowerCase().includes("political")) category = "🗳️ Politics";
+          else if (content.toLowerCase().includes("movie") || content.toLowerCase().includes("film") || content.toLowerCase().includes("cinema")) category = "🎬 Movie";
+          else if (content.toLowerCase().includes("gossip") || content.toLowerCase().includes("suriya") || content.toLowerCase().includes("comeback")) category = "🎥 Cinema Gossip";
+          else if (content.toLowerCase().includes("cricket") || content.toLowerCase().includes("ipl") || content.toLowerCase().includes("dhoni")) category = "🏏 Cricket";
+          else if (content.toLowerCase().includes("tech") || content.toLowerCase().includes("startup") || content.toLowerCase().includes("ai")) category = "💻 Tech";
+          else if (content.toLowerCase().includes("motivational") || content.toLowerCase().includes("success") || content.toLowerCase().includes("inspiring")) category = "🔥 Motivational";
+          
+          document.getElementById('imageCategory').innerHTML = `✅ Auto-detected: <strong>${category}</strong>`;
+        } catch (err) {
+          document.getElementById('imageCategory').innerHTML = "✅ Image uploaded";
+        }
       };
       reader.readAsDataURL(file);
     });
@@ -245,7 +294,28 @@
       alert("✅ tamil_voiceover.txt downloaded!");
     }
 
-    // Voice Recording Functions
+    // PDF Export
+    function exportAsPDF() {
+      if (!finalOutput) {
+        alert("Please generate a pack first!");
+        return;
+      }
+      
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.setFontSize(18);
+      doc.text("Trend Thala AI - YouTube Shorts Pack", 20, 20);
+      
+      doc.setFontSize(11);
+      const lines = doc.splitTextToSize(finalOutput, 170);
+      doc.text(lines, 20, 35);
+      
+      doc.save("Trend_Thala_AI_Shorts_Pack.pdf");
+      alert("✅ PDF downloaded successfully!");
+    }
+
+    // Voice Recording
     let isRecording = false;
 
     async function toggleRecording() {
@@ -255,7 +325,6 @@
       const downloadBtn = document.getElementById('downloadVoiceBtn');
 
       if (!isRecording) {
-        // Start Recording
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           mediaRecorder = new MediaRecorder(stream);
@@ -268,40 +337,37 @@
             audioPreview.src = audioUrl;
             audioPreview.style.display = 'block';
             downloadBtn.style.display = 'block';
-            status.innerHTML = "✅ Recording saved! You can play it above.";
+            status.innerHTML = "✅ Recording saved! Play preview above.";
           };
 
           mediaRecorder.start();
           isRecording = true;
           recordBtn.classList.add('recording');
           recordBtn.innerHTML = "⏹️ Stop Recording";
-          status.innerHTML = "🔴 Recording... Speak naturally in Tamil (5-10 seconds)";
+          status.innerHTML = "🔴 Recording... Speak naturally in Tamil (5-10 sec)";
         } catch (err) {
-          alert("❌ Microphone access denied. Please allow microphone permission.");
+          alert("❌ Microphone access denied.");
         }
       } else {
-        // Stop Recording
         mediaRecorder.stop();
         isRecording = false;
         recordBtn.classList.remove('recording');
         recordBtn.innerHTML = "🎙️ Record My Voice (5-10 sec)";
-        status.innerHTML = "✅ Recording complete! Play the preview above.";
+        status.innerHTML = "✅ Recording complete!";
       }
     }
 
     function downloadRecordedVoice() {
       if (!recordedBlob) return;
-      
       const url = URL.createObjectURL(recordedBlob);
       const a = document.createElement('a');
       a.href = url;
       a.download = 'my_voice_sample.wav';
       a.click();
       URL.revokeObjectURL(url);
-      alert("✅ Voice sample downloaded! Now use it in OmniVoice.");
+      alert("✅ Voice sample downloaded!");
     }
 
-    // Prepare for OmniVoice
     function prepareForOmniVoice() {
       const voiceMatch = finalOutput.match(/PART 9: Voiceover Script[\s\S]*?(?=PART 10:|$)/i);
       let script = voiceMatch ? voiceMatch[0].replace(/^PART 9: Voiceover Script\s*/i, '').trim() : "No script found. Generate first!";
@@ -317,17 +383,11 @@ ${script}
 
 5. Click Generate
 6. Download your cloned voice!
-
-Tips for best results:
-- Use 5-10 second clear recording
-- Speak naturally with your normal energy
-- Record in quiet place
 `;
 
       navigator.clipboard.writeText(instructions);
-      alert("✅ OmniVoice instructions + Tamil script copied!\n\nNow open the link and paste it.");
+      alert("✅ OmniVoice instructions + Tamil script copied!");
       
-      // Also download as file
       const blob = new Blob([instructions], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
