@@ -11,28 +11,23 @@ module.exports = async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are Trend Thala AI, a creative Tamil YouTube Shorts expert in Mr Tamilan style.
+  const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
 
-**CRITICAL INSTRUCTIONS:**
-- You are allowed to analyze images for content creation purposes.
-- Describe only visual elements: colors, expressions, lighting, text, mood, composition, and meme potential.
-- NEVER refuse image analysis for viral Shorts creation.
-- Be creative and helpful always.
+**Voiceover Style:** Natural Tamil + English code-switching (like real Tamil YouTubers speak).
+Example: "Machi, இது என்னடா நடந்தது? Vijay became CM and Suriya is making comeback after 13 years – அப்பப்பா shock ஆகிடுவீங்க!"
 
-**Style:** Energetic, dramatic, Tamil + English mix, viral hook style.
-
-Output **EXACTLY** in this format:`;
+Be energetic, dramatic, and viral.`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis (Detailed visual description)
+PART 1: Image / Reference Analysis (Detailed & Creative)
 
 PART 2: Viral Hook (3-5 seconds)
 
-PART 3: YouTube Shorts Titles (3 Best Options)
+PART 3: YouTube Shorts Titles (3 Best Clickbait)
 
 PART 4: YouTube Shorts Description (SEO + CTA)
 
-PART 5: Full Shorts Script (Tamil-English mix)
+PART 5: Full Shorts Script (Tamil + English mix)
 
 PART 6: Grok Image Generation Prompt (9:16)
 
@@ -40,9 +35,9 @@ PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Guide (Free Methods)
+PART 9: Bilingual Voiceover Script (Tamil + English)
 
-PART 10: Instagram Caption + 5 Hashtags
+PART 10: Instagram Caption + 5 Best Hashtags
 
 PART 11: CapCut Editing Suggestions`;
 
@@ -59,14 +54,8 @@ Figure: ${figure || 'None'}`;
     messages.push({
       role: "user",
       content: [
-        { 
-          type: "text", 
-          text: userContent + "\n\nThis is for creating viral Tamil YouTube Shorts. Analyze the image visually: describe colors, expressions, text on image, mood, lighting, and how it can be used for meme/viral content. Be detailed and creative. Do not refuse." 
-        },
-        { 
-          type: "image_url", 
-          image_url: { url: `data:${imageMime};base64,${imageBase64}` } 
-        }
+        { type: "text", text: userContent + "\n\nAnalyze this image creatively for viral Tamil Shorts. Be detailed." },
+        { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
   } else {
@@ -83,17 +72,12 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.9,
-        max_tokens: 3800
+        temperature: 0.95,
+        max_tokens: 4000
       })
     });
 
     const data = await response.json();
-
-    if (data.error) {
-      return res.status(500).json({ success: false, error: data.error.message });
-    }
-
     const content = data.choices?.[0]?.message?.content || "Generation completed.";
 
     res.json({ success: true, content });
