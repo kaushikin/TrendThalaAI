@@ -21,9 +21,10 @@
     label { display: block; font-weight: bold; margin: 18px 0 8px; font-size: 15px; }
     input, textarea, select { width: 100%; padding: 14px; border-radius: 15px; border: none; font-size: 16px; background: #fff; color: #111; }
     textarea { min-height: 85px; }
-    .btn { width: 100%; padding: 16px; margin: 14px 0 8px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .btn { width: 100%; padding: 16px; margin: 12px 0 8px; border: none; border-radius: 16px; font-size: 17px; font-weight: 900; cursor: pointer; }
     .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
     .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
+    .voice-btn { background: linear-gradient(45deg, #22c55e, #10b981); }
     .output { margin-top: 20px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 16px; line-height: 1.7; font-size: 15.2px; white-space: pre-wrap; }
     .preview { max-width: 100%; border-radius: 16px; margin: 12px 0; border: 3px solid #ff6a00; }
     .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -52,7 +53,7 @@
       <textarea id="links" placeholder="https://..."></textarea>
 
       <label>Special Instructions (Custom)</label>
-      <textarea id="custom" placeholder="No voice over needed\nMake it super shocking\nMix more English"></textarea>
+      <textarea id="custom" placeholder="No voice over needed\nMake it super shocking"></textarea>
 
       <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
@@ -65,6 +66,7 @@
 
       <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral Shorts Pack</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
+      <button class="btn voice-btn" onclick="downloadVoiceover()" id="voiceBtn" style="display:none;">🎤 Download Voiceover Script</button>
 
       <div class="spinner" id="spinner"></div>
       <div id="output" class="output" style="display:none;"></div>
@@ -72,11 +74,9 @@
   </div>
 
   <script>
-    // (Same script as previous message - no change needed)
     let finalOutput = "";
-    let imageBase64 = null;
-    let imageMime = null;
 
+    // Image Upload
     document.getElementById('imageUpload').addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
@@ -90,14 +90,19 @@
       reader.readAsDataURL(file);
     });
 
+    let imageBase64 = null;
+    let imageMime = null;
+
     async function generatePack() {
       const btn = document.getElementById('generateBtn');
       const spinner = document.getElementById('spinner');
       const outputDiv = document.getElementById('output');
+      const voiceBtn = document.getElementById('voiceBtn');
 
       btn.disabled = true;
       spinner.style.display = 'block';
       outputDiv.style.display = 'none';
+      voiceBtn.style.display = 'none';
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -124,6 +129,7 @@
 
       outputDiv.innerHTML = formatWithCopyButtons(finalOutput);
       outputDiv.style.display = 'block';
+      voiceBtn.style.display = 'block';   // Show Voiceover button
       spinner.style.display = 'none';
       btn.disabled = false;
     }
@@ -148,10 +154,24 @@
     }
 
     function copyOutput() {
-      if (finalOutput) {
-        navigator.clipboard.writeText(finalOutput);
-        alert("✅ Full Pack Copied!");
-      }
+      if (finalOutput) navigator.clipboard.writeText(finalOutput);
+      alert("✅ Full Pack Copied!");
+    }
+
+    // New: Download Voiceover Script
+    function downloadVoiceover() {
+      const voiceMatch = finalOutput.match(/PART 9: Voiceover Script[\s\S]*?(?=PART 10:|$)/i);
+      const script = voiceMatch ? voiceMatch[0].replace(/^PART 9: Voiceover Script\s*/i, '').trim() : finalOutput;
+
+      const blob = new Blob([script], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'voiceover_script.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      alert("✅ Voiceover script downloaded! Open in CapCut or TTS tool.");
     }
   </script>
 </body>
