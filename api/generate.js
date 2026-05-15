@@ -6,18 +6,28 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { topic, details, links, custom, mood, figure, imageBase64, imageMime } = req.body || {};
+  const { topic, details, links, custom, mood, figure, style, imageBase64, imageMime } = req.body || {};
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
+  // Style mapping
+  const styleMap = {
+    "mr-tamilan": "Write in Mr Tamilan style — energetic, dramatic, direct, uses words like அப்பப்பா, Shock ஆகிடுவீங்க, Machi, Full Explained",
+    "behindwoods": "Write in Behindwoods style — professional, detailed, slightly formal but exciting, good for movie updates",
+    "cinema-vikatan": "Write in Cinema Vikatan style — spicy, curious, fast-paced, gossip-style language",
+    "star-sports": "Write in Star Sports Tamil style — passionate, dramatic, cricket commentator energy, uses words like Sixer!, Massive!",
+    "tech-satish": "Write in Tech Satish style — clear, exciting, simple Tamil, tech YouTuber tone",
+    "tamil-motivational": "Write in Tamil Motivational style — emotional, powerful, inspiring, deep voice energy"
+  };
 
-**Top TTS Recommendations:**
-- **k2-fsa/OmniVoice** → Best for voice cloning (upload 3-10 sec of your voice)
-- **ai4bharat/indic-parler-tts** → Best natural Tamil + English mix
+  const styleInstruction = styleMap[style] || styleMap["mr-tamilan"];
 
-**Voiceover Style:** Pure Tamil, energetic Mr Tamilan style.
+  const systemPrompt = `You are Trend Thala AI — Expert Tamil YouTube Shorts Creator.
+
+**Content Style:** ${styleInstruction}
+
+**TTS Recommendation:** k2-fsa/OmniVoice (best for voice cloning) + ai4bharat/indic-parler-tts
 
 Output **EXACTLY** in this format:`;
 
@@ -51,7 +61,8 @@ Details: ${details || 'None'}
 Links: ${links || 'None'}
 Custom Instructions: ${custom || 'None'}
 Mood: ${mood || 'Dramatic'}
-Figure: ${figure || 'None'}`;
+Figure: ${figure || 'None'}
+Content Style: ${style || 'mr-tamilan'}`;
 
   let messages = [{ role: "system", content: systemPrompt + outputFormat }];
 
