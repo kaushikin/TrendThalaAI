@@ -13,35 +13,35 @@ module.exports = async (req, res) => {
 
   const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
 
-**Voiceover Rules (TTS Friendly):**
-- Use natural short sentences
-- Use "..." for short pauses (TTS tools understand this well)
-- Use "......" for longer pauses
-- Never write the word "pause"
-- Make energetic, dramatic Tamil + English mix
+**Best Free Tamil TTS Recommendation:**
+- **ai4bharat/indic-parler-tts** → Best quality for Tamil + English code-switching
+- Use it on Hugging Face Space for best results
+
+**Voiceover Style:** Energetic, dramatic, natural Tamil + English mix.
+Use "..." for natural pauses.
 
 Output **EXACTLY** in this format:`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis
+PART 1: Image / Reference Analysis (Detailed visual + meme potential)
 
-PART 2: Viral Hook
+PART 2: Viral Hook (3-5 seconds)
 
-PART 3: YouTube Shorts Titles (3 Best)
+PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
 
-PART 4: YouTube Shorts Description
+PART 4: YouTube Shorts Description (SEO + CTA)
 
-PART 5: Full Shorts Script
+PART 5: Full Shorts Script (Tamil-English mix)
 
-PART 6: Grok Image Generation Prompt
+PART 6: Grok Image Generation Prompt (9:16 vertical)
 
-PART 7: Grok Text-to-Video Prompt
+PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Script (TTS Ready with natural pauses)
+PART 9: Voiceover Script (TTS Ready with ai4bharat/indic-parler-tts)
 
-PART 10: Instagram Caption + 5 Hashtags
+PART 10: Instagram Caption + 5 Best Hashtags
 
 PART 11: CapCut Editing Suggestions`;
 
@@ -76,7 +76,7 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.92,
+        temperature: 0.93,
         max_tokens: 4000
       })
     });
