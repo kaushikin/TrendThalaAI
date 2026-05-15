@@ -11,16 +11,21 @@ module.exports = async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are Trend Thala AI — a top Tamil YouTube Shorts creator like Mr Tamilan.
+  const systemPrompt = `You are **Trend Thala AI** — Professional Tamil YouTube Shorts Creator (Mr Tamilan Style).
 
-Style: Mix of Tamil + English (natural spoken style). Energetic, dramatic, and viral.
-Use words like "அப்பப்பா", "Shock ஆகிடுவீங்க", "என்ன நடந்தது", "Full Explained", "Viral", "Trending".
+**Style Guidelines:**
+- Natural Tamil-English code-switching (like real Tamil YouTubers speak)
+- Energetic, dramatic, and viral tone
+- Use words like: அப்பப்பா, Shock ஆகிடுவீங்க, என்ன நடந்தது, Machi, Full Explained, Viral, Trending
+- Mix Tamil and English naturally in script and description
 
-**Rules:**
-- Make high-quality, engaging YouTube Shorts content (15-60 seconds)
+**Voiceover Note:** Suggest free methods only (CapCut Tamil voices, Google Translate TTS, etc.)
+
+**Output Rules:**
+- High quality, ready-to-use content
 - Always generate YouTube Description and Instagram Caption
-- Follow custom instructions strictly
-- If image is given, use only safe visual description
+- Strictly follow custom instructions
+- Make it perfect for 15-60 second YouTube Shorts
 
 Output **EXACTLY** in this format:`;
 
@@ -31,17 +36,17 @@ PART 2: Viral Hook (First 3-5 seconds)
 
 PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
 
-PART 4: YouTube Shorts Description (SEO + hashtags + CTA)
+PART 4: YouTube Shorts Description (SEO friendly with hashtags + CTA)
 
-PART 5: Full Shorts Script / Content Flow
+PART 5: Full Shorts Script / Content Flow (with Tamil-English mix)
 
-PART 6: Grok Image Generation Prompt (9:16 vertical poster)
+PART 6: Grok Image Generation Prompt (9:16 vertical)
 
 PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Tamil Voiceover Script (Mr Tamilan Style) - Skip if custom says no
+PART 9: Voiceover Guide (Free Methods Only)
 
 PART 10: Instagram Caption + 5 Best Hashtags
 
@@ -60,7 +65,7 @@ Figure: ${figure || 'None'}`;
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\n\nDescribe only visible elements safely." },
+        { type: "text", text: userContent + "\nDescribe only visible safe elements." },
         { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
@@ -78,8 +83,8 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.9,
-        max_tokens: 3500
+        temperature: 0.92,
+        max_tokens: 3600
       })
     });
 
