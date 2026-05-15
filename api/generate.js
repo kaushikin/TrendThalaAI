@@ -11,31 +11,41 @@ module.exports = async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are Trend Thala AI — Expert for Mr Tamilan Style YouTube Shorts.
+  const systemPrompt = `You are Trend Thala AI — a top Tamil YouTube Shorts creator like Mr Tamilan.
 
-**Important Vision Rules:**
-- If an image is provided, describe only visible objects, colors, mood, text, background, and composition.
-- NEVER identify real people, celebrities, or faces by name.
-- Just say "a person", "a man", "a crowd", "a political figure", etc.
-- Focus on visual elements useful for content creation.
+Style: Mix of Tamil + English (natural spoken style). Energetic, dramatic, and viral.
+Use words like "அப்பப்பா", "Shock ஆகிடுவீங்க", "என்ன நடந்தது", "Full Explained", "Viral", "Trending".
 
-**Mr Tamilan Shorts Style:**
-- Strong curiosity hooks: "என்ன நடந்தது?", "அப்பப்பா!", "Shock ஆகிடுவீங்க!"
-- Fast 15-60 second format.
+**Rules:**
+- Make high-quality, engaging YouTube Shorts content (15-60 seconds)
+- Always generate YouTube Description and Instagram Caption
+- Follow custom instructions strictly
+- If image is given, use only safe visual description
 
 Output **EXACTLY** in this format:`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis (only visual elements)
+PART 1: Image / Reference Analysis (visual only)
+
 PART 2: Viral Hook (First 3-5 seconds)
-PART 3: YouTube Shorts Titles (3 Clickbait Options)
-PART 4: Full Shorts Content Flow
-PART 5: Grok Image Generation Prompt (9:16)
-PART 6: Grok Text-to-Video Prompt (6-10s scenes)
-PART 7: Grok Image-to-Video Prompt
-PART 8: Tamil Voiceover Script (Skip if custom says no voice over)
-PART 9: CapCut Editing Template Suggestions
-PART 10: Hashtags & SEO Keywords`;
+
+PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
+
+PART 4: YouTube Shorts Description (SEO + hashtags + CTA)
+
+PART 5: Full Shorts Script / Content Flow
+
+PART 6: Grok Image Generation Prompt (9:16 vertical poster)
+
+PART 7: Grok Text-to-Video Prompt (6-10s scenes)
+
+PART 8: Grok Image-to-Video Prompt
+
+PART 9: Tamil Voiceover Script (Mr Tamilan Style) - Skip if custom says no
+
+PART 10: Instagram Caption + 5 Best Hashtags
+
+PART 11: CapCut Editing Suggestions`;
 
   let userContent = `Topic: ${topic || 'No topic'}
 Details: ${details || 'None'}
@@ -50,14 +60,8 @@ Figure: ${figure || 'None'}`;
     messages.push({
       role: "user",
       content: [
-        { 
-          type: "text", 
-          text: userContent + "\n\nDescribe only the visible visual elements, colors, mood, and composition in the image. Do not identify specific people." 
-        },
-        { 
-          type: "image_url", 
-          image_url: { url: `data:${imageMime};base64,${imageBase64}` } 
-        }
+        { type: "text", text: userContent + "\n\nDescribe only visible elements safely." },
+        { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
   } else {
@@ -74,18 +78,13 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.85,
-        max_tokens: 3200
+        temperature: 0.9,
+        max_tokens: 3500
       })
     });
 
     const data = await response.json();
-    
-    if (data.error) {
-      return res.status(500).json({ success: false, error: data.error.message });
-    }
-
-    const content = data.choices[0]?.message?.content || "Generation completed.";
+    const content = data.choices[0]?.message?.content || "Generation failed.";
 
     res.json({ success: true, content });
 
