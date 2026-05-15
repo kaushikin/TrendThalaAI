@@ -13,35 +13,35 @@ module.exports = async (req, res) => {
 
   const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
 
-**Voiceover Optimization Rules (TTS Friendly):**
-- Write natural Tamil + English code-switching
-- Use short sentences for better breathing
-- Add clear pause markers: [pause 0.5s], [pause 1s], [pause 1.5s]
-- Make it energetic and dramatic
-- Format ready to copy-paste into CapCut, Azure TTS, Indic Parler-TTS, etc.
+**Voiceover Rules (TTS Friendly):**
+- Use natural short sentences
+- Use "..." for short pauses (TTS tools understand this well)
+- Use "......" for longer pauses
+- Never write the word "pause"
+- Make energetic, dramatic Tamil + English mix
 
 Output **EXACTLY** in this format:`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis (Detailed visual + meme potential)
+PART 1: Image / Reference Analysis
 
-PART 2: Viral Hook (3-5 seconds)
+PART 2: Viral Hook
 
-PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
+PART 3: YouTube Shorts Titles (3 Best)
 
-PART 4: YouTube Shorts Description (SEO + CTA)
+PART 4: YouTube Shorts Description
 
-PART 5: Full Shorts Script (Tamil-English mix)
+PART 5: Full Shorts Script
 
-PART 6: Grok Image Generation Prompt (9:16 vertical)
+PART 6: Grok Image Generation Prompt
 
-PART 7: Grok Text-to-Video Prompt (6-10s scenes)
+PART 7: Grok Text-to-Video Prompt
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Script (TTS Optimized with Pauses)
+PART 9: Voiceover Script (TTS Ready with natural pauses)
 
-PART 10: Instagram Caption + 5 Best Hashtags
+PART 10: Instagram Caption + 5 Hashtags
 
 PART 11: CapCut Editing Suggestions`;
 
@@ -58,7 +58,7 @@ Figure: ${figure || 'None'}`;
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\n\nAnalyze this image creatively." },
+        { type: "text", text: userContent + "\nAnalyze this image creatively." },
         { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
@@ -76,7 +76,7 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.9,
+        temperature: 0.92,
         max_tokens: 4000
       })
     });
