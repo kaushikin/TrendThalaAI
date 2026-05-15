@@ -86,6 +86,19 @@
       <img id="imagePreview" class="preview" style="display:none;" />
       <div id="imageCategory" style="margin-top: 8px; font-size: 13px; color: #22c55e;"></div>
 
+      <!-- Creator Style Dropdown -->
+      <div style="margin: 16px 0;">
+        <label>Content Style (Creator Style)</label>
+        <select id="style" style="width: 100%; padding: 12px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111;">
+          <option value="mr-tamilan">Mr Tamilan (Default - Energetic & Dramatic)</option>
+          <option value="behindwoods">Behindwoods (Professional Movie Style)</option>
+          <option value="cinema-vikatan">Cinema Vikatan (Spicy Gossip Style)</option>
+          <option value="star-sports">Star Sports Tamil (Cricket Passion Style)</option>
+          <option value="tech-satish">Tech Satish (Clear Tech Style)</option>
+          <option value="tamil-motivational">Tamil Motivational (Emotional & Inspiring)</option>
+        </select>
+      </div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div><label>Mood</label><select id="mood"><option>Dramatic</option><option>Shocking</option><option>Emotional</option><option>Angry</option><option>Funny</option></select></div>
         <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
@@ -178,7 +191,6 @@
         document.getElementById('imagePreview').src = ev.target.result;
         document.getElementById('imagePreview').style.display = 'block';
         
-        // Auto-detect category using backend
         try {
           const res = await fetch('/api/generate', {
             method: 'POST',
@@ -197,7 +209,6 @@
           const result = await res.json();
           const content = result.content || "";
           
-          // Simple detection
           let category = "Other";
           if (content.toLowerCase().includes("politics") || content.toLowerCase().includes("vijay") || content.toLowerCase().includes("political")) category = "🗳️ Politics";
           else if (content.toLowerCase().includes("movie") || content.toLowerCase().includes("film") || content.toLowerCase().includes("cinema")) category = "🎬 Movie";
@@ -232,6 +243,7 @@
         custom: document.getElementById('custom').value.trim(),
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
+        style: document.getElementById('style').value,
         imageBase64, imageMime
       };
 
@@ -294,7 +306,6 @@
       alert("✅ tamil_voiceover.txt downloaded!");
     }
 
-    // PDF Export
     function exportAsPDF() {
       if (!finalOutput) {
         alert("Please generate a pack first!");
@@ -315,7 +326,6 @@
       alert("✅ PDF downloaded successfully!");
     }
 
-    // Voice Recording
     let isRecording = false;
 
     async function toggleRecording() {
