@@ -13,29 +13,35 @@ module.exports = async (req, res) => {
 
   const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
 
-**Voiceover Style:** Natural Tamil + English code-switching (like real Tamil YouTubers speak).
-Example: "Machi, இது என்னடா நடந்தது? Vijay became CM and Suriya is making comeback after 13 years – அப்பப்பா shock ஆகிடுவீங்க!"
+**Voiceover Style:** Natural Tamil + English code-switching, energetic, dramatic, and engaging.
+Example: "Machi, இது என்னடா நடந்தது? Vijay became CM and Suriya is back after 13 years – அப்பப்பா shock ஆகிடுவீங்க da!"
 
-Be energetic, dramatic, and viral.`;
+**Best Free Tamil TTS Tools:**
+- ai4bharat/indic-parler-tts (Best quality)
+- Nidum-Madurai-Tamil-TTS
+- CapCut built-in Tamil voices
+- Google Translate TTS (quick)
+
+Output **EXACTLY** in this format:`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis (Detailed & Creative)
+PART 1: Image / Reference Analysis (Detailed visual + meme potential)
 
-PART 2: Viral Hook (3-5 seconds)
+PART 2: Viral Hook (Strong 3-5 seconds)
 
-PART 3: YouTube Shorts Titles (3 Best Clickbait)
+PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
 
 PART 4: YouTube Shorts Description (SEO + CTA)
 
-PART 5: Full Shorts Script (Tamil + English mix)
+PART 5: Full Shorts Script (Natural Tamil + English mix)
 
-PART 6: Grok Image Generation Prompt (9:16)
+PART 6: Grok Image Generation Prompt (9:16 vertical)
 
 PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Bilingual Voiceover Script (Tamil + English)
+PART 9: Voiceover Script (Bilingual Tamil + English) + Free TTS Guide
 
 PART 10: Instagram Caption + 5 Best Hashtags
 
@@ -54,7 +60,7 @@ Figure: ${figure || 'None'}`;
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\n\nAnalyze this image creatively for viral Tamil Shorts. Be detailed." },
+        { type: "text", text: userContent + "\n\nAnalyze this image creatively for viral Shorts content." },
         { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
@@ -72,7 +78,7 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.95,
+        temperature: 0.93,
         max_tokens: 4000
       })
     });
