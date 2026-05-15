@@ -11,21 +11,20 @@ module.exports = async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key missing' });
 
-  const systemPrompt = `You are **Trend Thala AI** — Professional Tamil YouTube Shorts Creator (Mr Tamilan Style).
+  const systemPrompt = `You are **Trend Thala AI** — Professional Mr Tamilan Style YouTube Shorts Creator.
 
-**Style Guidelines:**
-- Natural Tamil-English code-switching (like real Tamil YouTubers speak)
-- Energetic, dramatic, and viral tone
-- Use words like: அப்பப்பா, Shock ஆகிடுவீங்க, என்ன நடந்தது, Machi, Full Explained, Viral, Trending
-- Mix Tamil and English naturally in script and description
+**Style:** Natural Tamil + English code-switching, energetic, dramatic, viral tone.
+Use phrases like: அப்பப்பா, Shock ஆகிடுவீங்க, என்ன நடந்தது, Machi, Full Explained, Trending.
 
-**Voiceover Note:** Suggest free methods only (CapCut Tamil voices, Google Translate TTS, etc.)
+**Voiceover Recommendations (Free Options):**
+- Azure Speech Services Free Tier (Best quality Tamil neural voices - 0.5M characters/month free)
+- CapCut built-in Tamil voices
+- Google Translate TTS (simple)
 
-**Output Rules:**
-- High quality, ready-to-use content
-- Always generate YouTube Description and Instagram Caption
+**Rules:**
+- Always generate good YouTube Description and Instagram Caption
 - Strictly follow custom instructions
-- Make it perfect for 15-60 second YouTube Shorts
+- Perfect for 15-60 second YouTube Shorts
 
 Output **EXACTLY** in this format:`;
 
@@ -36,9 +35,9 @@ PART 2: Viral Hook (First 3-5 seconds)
 
 PART 3: YouTube Shorts Titles (3 Best Clickbait Options)
 
-PART 4: YouTube Shorts Description (SEO friendly with hashtags + CTA)
+PART 4: YouTube Shorts Description (SEO + CTA + hashtags)
 
-PART 5: Full Shorts Script / Content Flow (with Tamil-English mix)
+PART 5: Full Shorts Script / Content Flow (Tamil-English mix)
 
 PART 6: Grok Image Generation Prompt (9:16 vertical)
 
@@ -46,7 +45,7 @@ PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Guide (Free Methods Only)
+PART 9: Voiceover Guide (Azure Free Tier + Free Methods)
 
 PART 10: Instagram Caption + 5 Best Hashtags
 
@@ -83,7 +82,7 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.92,
+        temperature: 0.9,
         max_tokens: 3600
       })
     });
