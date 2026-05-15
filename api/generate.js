@@ -13,10 +13,12 @@ module.exports = async (req, res) => {
 
   const systemPrompt = `You are Trend Thala AI — Expert Mr Tamilan Style Tamil YouTube Shorts Creator.
 
-**Voiceover Rules:**
-- Write clean, natural Tamil + English code-switching
+**Voiceover Optimization Rules (TTS Friendly):**
+- Write natural Tamil + English code-switching
+- Use short sentences for better breathing
+- Add clear pause markers: [pause 0.5s], [pause 1s], [pause 1.5s]
 - Make it energetic and dramatic
-- Format for easy TTS: short sentences, good pauses, ready to copy-paste into CapCut / Azure / Indic Parler-TTS
+- Format ready to copy-paste into CapCut, Azure TTS, Indic Parler-TTS, etc.
 
 Output **EXACTLY** in this format:`;
 
@@ -37,7 +39,7 @@ PART 7: Grok Text-to-Video Prompt (6-10s scenes)
 
 PART 8: Grok Image-to-Video Prompt
 
-PART 9: Voiceover Script (Clean Bilingual - Ready for TTS)
+PART 9: Voiceover Script (TTS Optimized with Pauses)
 
 PART 10: Instagram Caption + 5 Best Hashtags
 
@@ -74,7 +76,7 @@ Figure: ${figure || 'None'}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.93,
+        temperature: 0.9,
         max_tokens: 4000
       })
     });
