@@ -13,20 +13,24 @@ module.exports = async (req, res) => {
 
   let systemPrompt = `You are Trend Thala AI — Expert Tamil YouTube Shorts & Meme Creator.`;
 
-  // Special Meme Mode
-  if (style === "meme" || (custom && custom.toLowerCase().includes("meme"))) {
+  // Style Handling
+  if (style === "meme") {
     systemPrompt += `
-**MODE: VIRAL MEME POSTER**
-- Create super viral, funny, relatable Tamil meme style
-- Use bold, big text, dramatic reactions, trending meme formats
-- Heavy use of Tamil slang, emojis, shock value, and sarcasm
-- Perfect for YouTube Shorts thumbnail + Instagram post
-- Focus on maximum shareability and laugh factor`;
+**MODE: VIRAL MEME POSTER (Balanced)**
+- Create powerful memes that are **funny + educative + meaningful**
+- Mix humor with strong message, life lessons, shocking facts, or social awareness
+- Use bold Tamil text, reactions, and trending meme formats
+- Make it shareable and thought-provoking`;
   } else {
-    systemPrompt += `
-**Content Style:** ${style === "mr-tamilan" ? "Energetic Mr Tamilan style" : 
-                    style === "behindwoods" ? "Professional Behindwoods style" : 
-                    style === "cinema-vikatan" ? "Spicy Cinema Vikatan gossip style" : "Energetic style"}`;
+    const styleMap = {
+      "mr-tamilan": "Energetic Mr Tamilan style — dramatic, direct, uses அப்பப்பா, Shock ஆகிடுவீங்க, Machi",
+      "behindwoods": "Professional Behindwoods style — detailed, exciting movie/news tone",
+      "cinema-vikatan": "Spicy Cinema Vikatan gossip style — curious and fast-paced",
+      "star-sports": "Star Sports Tamil commentator style — passionate and dramatic",
+      "tech-satish": "Clear Tech Satish style — simple and exciting explanations",
+      "tamil-motivational": "Emotional Tamil Motivational style — inspiring and powerful"
+    };
+    systemPrompt += `**Content Style:** ${styleMap[style] || styleMap["mr-tamilan"]}`;
   }
 
   systemPrompt += `
@@ -34,17 +38,17 @@ module.exports = async (req, res) => {
 Output **EXACTLY** in this format:`;
 
   const outputFormat = `
-PART 1: Image / Reference Analysis (Meme Potential)
+PART 1: Image / Reference Analysis (Meme & Message Potential)
 
-PART 2: Viral Hook (Super Catchy)
+PART 2: Viral Hook
 
-PART 3: YouTube Shorts Titles (3 Best Meme Style)
+PART 3: YouTube Shorts Titles (3 Best)
 
-PART 4: YouTube Shorts Description (with hashtags)
+PART 4: YouTube Shorts Description
 
 PART 5: Full Shorts Script (Tamil + English mix)
 
-PART 6: Grok Meme Poster Prompt (9:16 - Very Detailed)
+PART 6: Grok Meme Poster Prompt (9:16 - Bold & Powerful)
 
 PART 7: Grok Text-to-Video Prompt
 
@@ -52,18 +56,18 @@ PART 8: Grok Image-to-Video Prompt
 
 PART 9: Voiceover Script (Pure Tamil)
 
-PART 10: Thumbnail / Meme Text Ideas (3 Bold Options)
+PART 10: Thumbnail / Meme Text Ideas (3 Strong Options)
 
 PART 11: Instagram Caption + 5 Viral Hashtags
 
-PART 12: CapCut Editing Suggestions (Meme Style)`;
+PART 12: CapCut Editing Suggestions`;
 
   let userContent = `Topic: ${topic || 'No topic'}
 Details: ${details || 'None'}
-Custom: ${custom || 'None'}
-Mood: ${mood || 'Funny'}
+Custom Instructions: ${custom || 'None'}
+Mood: ${mood || 'Powerful'}
 Figure: ${figure || 'None'}
-Mode: ${style === "meme" ? "Meme Poster Mode" : "Normal"}`;
+Mode: ${style === "meme" ? "Balanced Meme (Funny + Educative + Meaningful)" : "Normal"}`;
 
   let messages = [{ role: "system", content: systemPrompt + outputFormat }];
 
@@ -71,7 +75,7 @@ Mode: ${style === "meme" ? "Meme Poster Mode" : "Normal"}`;
     messages.push({
       role: "user",
       content: [
-        { type: "text", text: userContent + "\nAnalyze this image for meme potential. Focus on facial expressions, text, and how to make it funny/viral." },
+        { type: "text", text: userContent + "\nAnalyze this image for strong meme + meaningful content potential." },
         { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` }}
       ]
     });
@@ -89,7 +93,7 @@ Mode: ${style === "meme" ? "Meme Poster Mode" : "Normal"}`;
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: 0.95,        // High creativity for memes
+        temperature: style === "meme" ? 0.92 : 0.9,
         max_tokens: 4200
       })
     });
