@@ -54,7 +54,7 @@
     <section class="card">
       <div class="section-title">Create Viral YouTube Short</div>
 
-      <!-- Preset Templates -->
+      <!-- Quick Templates -->
       <div style="margin-bottom: 12px;">
         <label>Quick Templates</label>
         <div style="display: flex; flex-wrap: wrap; gap: 6px;">
@@ -113,16 +113,33 @@
       <div id="output" class="output" style="display:none;"></div>
     </section>
 
-    <!-- Voice Cloning Section -->
+    <!-- Voice Recording + OmniVoice Cloning Section -->
     <section class="card" style="margin-top: 20px; border: 2px solid #22c55e;">
-      <h3 style="margin:0 0 12px 0; color:#22c55e;">🎤 Record Your Voice + Clone with OmniVoice</h3>
-      <div style="margin-bottom:16px;">
+      <h3 style="margin: 0 0 12px 0; color: #22c55e;">🎤 Record Your Voice (For OmniVoice Cloning)</h3>
+      
+      <div style="margin-bottom: 16px;">
         <button id="recordBtn" class="btn record-btn" onclick="toggleRecording()">🎙️ Record My Voice (5-10 sec)</button>
-        <div id="recordingStatus" style="text-align:center;margin-top:8px;font-size:14px;color:#ddd;"></div>
-        <audio id="audioPreview" controls style="width:100%;margin-top:10px;display:none;"></audio>
-        <button id="downloadVoiceBtn" class="btn" style="background:#eab308;color:black;margin-top:8px;display:none;" onclick="downloadRecordedVoice()">⬇️ Download My Voice Sample</button>
+        <div id="recordingStatus" style="text-align: center; margin-top: 8px; font-size: 14px; color: #ddd;"></div>
+        
+        <audio id="audioPreview" controls style="width: 100%; margin-top: 10px; display: none;"></audio>
+        
+        <button id="downloadVoiceBtn" class="btn" style="background: #eab308; color: black; margin-top: 8px; display: none;" onclick="downloadRecordedVoice()">
+          ⬇️ Download My Voice Sample
+        </button>
       </div>
-      <button class="btn" style="background:#22c55e;color:black;" onclick="prepareForOmniVoice()">📋 Copy Tamil Script + OmniVoice Instructions</button>
+
+      <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px; margin-bottom: 12px; font-size: 14px;">
+        <strong>How to clone your voice:</strong><br><br>
+        1. Record 5-10 seconds of your voice<br>
+        2. Download the voice sample<br>
+        3. Go to <a href="https://huggingface.co/spaces/k2-fsa/OmniVoice" target="_blank" style="color: #22c55e;">OmniVoice Demo</a><br>
+        4. Upload your voice sample + paste Tamil script from PART 9<br>
+        5. Generate → Your voice will speak the full script!
+      </div>
+
+      <button class="btn" style="background: #22c55e; color: black;" onclick="prepareForOmniVoice()">
+        📋 Copy Tamil Script + OmniVoice Instructions
+      </button>
     </section>
   </div>
 
@@ -281,11 +298,98 @@
       alert("✅ PDF Downloaded!");
     }
 
-    // Voice Recording (same as before)
+    // ==================== VOICE RECORDING ====================
     let isRecording = false;
-    async function toggleRecording() { /* ... same code as previous version ... */ }
-    function downloadRecordedVoice() { /* ... same ... */ }
-    function prepareForOmniVoice() { /* ... same ... */ }
+
+    async function toggleRecording() {
+      const recordBtn = document.getElementById('recordBtn');
+      const status = document.getElementById('recordingStatus');
+      const audioPreview = document.getElementById('audioPreview');
+      const downloadBtn = document.getElementById('downloadVoiceBtn');
+
+      if (!isRecording) {
+        // Start Recording
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(recordedBlob);
+            audioPreview.src = audioUrl;
+            audioPreview.style.display = 'block';
+            downloadBtn.style.display = 'block';
+            status.innerHTML = "✅ Recording saved! Play the preview above.";
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recordBtn.classList.add('recording');
+          recordBtn.innerHTML = "⏹️ Stop Recording";
+          status.innerHTML = "🔴 Recording... Speak naturally in Tamil (5-10 seconds)";
+        } catch (err) {
+          status.innerHTML = "❌ Microphone permission denied. Please allow microphone access in your browser settings.";
+          alert("❌ Microphone permission denied.\n\nPlease go to your phone's browser settings and allow microphone permission for this site.");
+        }
+      } else {
+        // Stop Recording
+        if (mediaRecorder) {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        recordBtn.classList.remove('recording');
+        recordBtn.innerHTML = "🎙️ Record My Voice (5-10 sec)";
+        status.innerHTML = "✅ Recording complete! Play the preview above.";
+      }
+    }
+
+    function downloadRecordedVoice() {
+      if (!recordedBlob) return;
+      
+      const url = URL.createObjectURL(recordedBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'my_voice_sample.wav';
+      a.click();
+      URL.revokeObjectURL(url);
+      alert("✅ Voice sample downloaded! Now use it in OmniVoice.");
+    }
+
+    function prepareForOmniVoice() {
+      const voiceMatch = finalOutput.match(/PART 9: Voiceover Script[\s\S]*?(?=PART 10:|$)/i);
+      let script = voiceMatch ? voiceMatch[0].replace(/^PART 9: Voiceover Script\s*/i, '').trim() : "No script found. Generate first!";
+
+      const instructions = `=== OMNIVOICE VOICE CLONING INSTRUCTIONS ===
+
+1. Go to: https://huggingface.co/spaces/k2-fsa/OmniVoice
+2. Select "Voice Clone" mode
+3. Upload your voice sample (my_voice_sample.wav)
+4. Paste this Tamil script:
+
+${script}
+
+5. Click Generate
+6. Download your cloned voice!
+
+Tips for best results:
+- Use 5-10 second clear recording
+- Speak naturally with your normal energy
+- Record in quiet place
+`;
+
+      navigator.clipboard.writeText(instructions);
+      alert("✅ OmniVoice instructions + Tamil script copied!\n\nNow open the link and paste it.");
+      
+      const blob = new Blob([instructions], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'omnivoice_instructions.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   </script>
 </body>
 </html>
