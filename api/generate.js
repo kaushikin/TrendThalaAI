@@ -110,7 +110,6 @@ Mode: ${style === "meme" ? "Balanced Meme (Funny + Educative + Meaningful)" : "N
     const data = await response.json();
 
     if (data.error) {
-      // If OpenAI refuses, return special fallback message
       if (data.error.message && data.error.message.toLowerCase().includes("can't assist")) {
         return res.json({
           success: false,
