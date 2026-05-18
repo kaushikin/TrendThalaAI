@@ -14,22 +14,22 @@ module.exports = async (req, res) => {
   let systemPrompt = `You are Trend Thala AI — Expert Tamil YouTube Shorts & Meme Creator.`;
 
   // Style Handling
+  const styleMap = {
+    "mr-tamilan": "Energetic Mr Tamilan style — dramatic, direct, uses அப்பப்பா, Shock ஆகிடுவீங்க, Machi",
+    "behindwoods": "Professional Behindwoods style — detailed, exciting",
+    "cinema-vikatan": "Spicy Cinema Vikatan gossip style",
+    "star-sports": "Star Sports Tamil passionate commentator style",
+    "tech-satish": "Clear Tech Satish explanatory style",
+    "tamil-motivational": "Emotional Tamil Motivational style",
+    "meme": "Balanced Meme Style — Funny + Educative + Meaningful"
+  };
+
   if (style === "meme") {
     systemPrompt += `
-**MODE: VIRAL MEME POSTER (Balanced)**
-- Create powerful memes that are **funny + educative + meaningful**
-- Mix humor with strong message, life lessons, shocking facts, or social awareness
-- Use bold Tamil text, reactions, and trending meme formats
-- Make it shareable and thought-provoking`;
+**MODE: VIRAL MEME POSTER (Funny + Educative + Meaningful)**
+- Create powerful memes that are humorous but also deliver strong messages, life lessons, social awareness or shocking truths.
+- Mix comedy with depth.`;
   } else {
-    const styleMap = {
-      "mr-tamilan": "Energetic Mr Tamilan style — dramatic, direct, uses அப்பப்பா, Shock ஆகிடுவீங்க, Machi",
-      "behindwoods": "Professional Behindwoods style — detailed, exciting movie/news tone",
-      "cinema-vikatan": "Spicy Cinema Vikatan gossip style — curious and fast-paced",
-      "star-sports": "Star Sports Tamil commentator style — passionate and dramatic",
-      "tech-satish": "Clear Tech Satish style — simple and exciting explanations",
-      "tamil-motivational": "Emotional Tamil Motivational style — inspiring and powerful"
-    };
     systemPrompt += `**Content Style:** ${styleMap[style] || styleMap["mr-tamilan"]}`;
   }
 
@@ -46,9 +46,9 @@ PART 3: YouTube Shorts Titles (3 Best)
 
 PART 4: YouTube Shorts Description
 
-PART 5: Full Shorts Script (Tamil + English mix)
+PART 5: Full Shorts Script
 
-PART 6: Grok Meme Poster Prompt (9:16 - Bold & Powerful)
+PART 6: Grok Meme Poster Prompt (9:16 Vertical - Very Detailed)
 
 PART 7: Grok Text-to-Video Prompt
 
@@ -93,7 +93,7 @@ Mode: ${style === "meme" ? "Balanced Meme (Funny + Educative + Meaningful)" : "N
       body: JSON.stringify({
         model: "gpt-4o",
         messages: messages,
-        temperature: style === "meme" ? 0.92 : 0.9,
+        temperature: style === "meme" ? 0.88 : 0.9,
         max_tokens: 4200
       })
     });
