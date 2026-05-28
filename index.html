@@ -294,6 +294,40 @@
       btn.innerHTML = "😂 Generate Meme Poster Pack";
     }
 
+    async function generateHighEngagement() {
+  const btn = document.getElementById('engagementBtn');
+  btn.disabled = true;
+  btn.innerHTML = "Generating High Engagement Content...";
+
+  const data = {
+    topic: document.getElementById('topic').value.trim(),
+    details: document.getElementById('details').value.trim(),
+    custom: document.getElementById('custom').value.trim(),
+    mood: document.getElementById('mood').value,
+    figure: document.getElementById('figure').value.trim(),
+    style: document.getElementById('style').value,
+    imageBase64, imageMime,
+    highEngagement: true   // ← This tells backend to use High Engagement mode
+  };
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    finalOutput = result.content || "Generation completed.";
+  } catch (e) {
+    finalOutput = "❌ Failed to generate high engagement content.";
+  }
+
+  document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
+  document.getElementById('output').style.display = 'block';
+  btn.disabled = false;
+  btn.innerHTML = "🔥 High Engagement Mode";
+}
+
     function formatWithCopyButtons(text) {
       let html = `<div style="background:rgba(0,0,0,0.4);padding:16px;border-radius:12px;">${text}</div>`;
       const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
