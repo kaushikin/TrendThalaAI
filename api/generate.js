@@ -28,7 +28,8 @@ module.exports = async (req, res) => {
       goal = "views",
       imageInstruction = "",
       imageBase64 = null,
-      imageMime = null
+      imageMime = null,
+      highEngagement = false          // ← NEW: High Engagement Mode
     } = req.body || {};
 
     const clean = (value, max = 1500) => String(value || "").trim().slice(0, max);
@@ -58,6 +59,22 @@ module.exports = async (req, res) => {
 
     const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
 
+    // ==================== NEW: High Engagement Boost ====================
+    let engagementBoost = "";
+    if (highEngagement) {
+      engagementBoost = `
+**HIGH ENGAGEMENT MODE ACTIVATED**
+- Create extremely powerful and emotional hooks (shock, curiosity, anger, inspiration, fear)
+- Use strong rhetorical questions and pattern interrupts
+- Add cliffhangers and retention tricks in every scene
+- Make the script more dramatic, fast-paced, and energetic
+- Include powerful calls to action for comments, shares, and saves
+- Use more emotional and viral Tamil creator language
+- Focus on maximum watch time and engagement
+`;
+    }
+    // ================================================================
+
     const systemPrompt = `
 You are Trend Thala AI — a Tamil-English viral content strategist for YouTube Shorts, Instagram Reels, meme posters, and creator SEO.
 
@@ -70,6 +87,8 @@ Important safety rules: Do not create fake claims. For sensitive topics use safe
 Image handling: If an image is uploaded, analyze visible elements and connect them with the topic.
 
 SEO rules: YouTube title must include searchable keywords. YouTube description first 2 lines must include main topic keyword. Instagram caption first line must include topic keyword naturally.
+
+${engagementBoost}
 
 Output EXACTLY in this format:
 PART 1: Image Analysis and Context Connection
@@ -140,7 +159,7 @@ Must include:
       body: JSON.stringify({
         model: imageBase64 ? "gpt-4o" : "gpt-4o-mini",
         messages,
-        temperature: 0.82,
+        temperature: highEngagement ? 0.88 : 0.82,   // ← Slightly higher creativity in High Engagement mode
         max_tokens: 3500
       })
     });
