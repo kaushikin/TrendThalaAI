@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
       imageInstruction = "",
       imageBase64 = null,
       imageMime = null,
-      highEngagement = false          // ← NEW: High Engagement Mode
+      highEngagement = false
     } = req.body || {};
 
     const clean = (value, max = 1500) => String(value || "").trim().slice(0, max);
@@ -59,36 +59,35 @@ module.exports = async (req, res) => {
 
     const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
 
-    // ==================== NEW: High Engagement Boost ====================
+    // High Engagement Boost
     let engagementBoost = "";
     if (highEngagement) {
       engagementBoost = `
 **HIGH ENGAGEMENT MODE ACTIVATED**
-- Create extremely powerful and emotional hooks (shock, curiosity, anger, inspiration, fear)
-- Use strong rhetorical questions and pattern interrupts
-- Add cliffhangers and retention tricks in every scene
-- Make the script more dramatic, fast-paced, and energetic
-- Include powerful calls to action for comments, shares, and saves
-- Use more emotional and viral Tamil creator language
+- Make hooks extremely powerful (shock, curiosity, anger, inspiration)
+- Add pattern interrupts and cliffhangers
+- Make the script more dramatic and fast-paced
 - Focus on maximum watch time and engagement
 `;
     }
-    // ================================================================
 
     const systemPrompt = `
 You are Trend Thala AI — a Tamil-English viral content strategist for YouTube Shorts, Instagram Reels, meme posters, and creator SEO.
 
-Your main job: Create content that improves reach using YouTube Shorts SEO, Instagram Reels SEO, strong hooks, retention structure, rewatch loops, comment triggers, and Tamil audience psychology.
+Your main job: Create content that improves reach using strong hooks, retention structure, rewatch loops, comment triggers, and Tamil audience psychology.
 
 Tone: Tamil-English mixed, viral Tamil creator style, punchy, clear, emotional when needed.
 
-Important safety rules: Do not create fake claims. For sensitive topics use safe wording like "reports say", "social media buzz", "as per current updates".
-
-Image handling: If an image is uploaded, analyze visible elements and connect them with the topic.
-
-SEO rules: YouTube title must include searchable keywords. YouTube description first 2 lines must include main topic keyword. Instagram caption first line must include topic keyword naturally.
-
 ${engagementBoost}
+
+=== GROK PROMPT RULES (Very Important) ===
+When writing prompts for Grok Image and Grok Video:
+- Be extremely detailed and specific
+- Mention 9:16 vertical format clearly
+- Describe camera movements, lighting, text style, and mood
+- Use cinematic and Tamil cultural references when possible
+- Make poster prompts bold, dramatic, and eye-catching
+- Make video prompts dynamic with fast cuts and emotional pacing
 
 Output EXACTLY in this format:
 PART 1: Image Analysis and Context Connection
@@ -96,10 +95,10 @@ PART 2: Viral Hook Options
 PART 3: SEO Keyword Strategy
 PART 4: YouTube Shorts Title Options
 PART 5: YouTube SEO Description
-PART 6: Full 5-Scene Shorts Script
-PART 7: Poster / Thumbnail Prompt
-PART 8: Instagram Caption + Instagram SEO Alt Text
-PART 9: Voiceover Script (Start with a strong 3-5 second hook, then continue naturally in Pure Tamil)
+PART 6: Grok Poster Prompt (9:16 - Very Detailed for Grok Image Generation)
+PART 7: Grok Text-to-Video Prompt (Strong & Cinematic)
+PART 8: Grok Image-to-Video Prompt (If image is used)
+PART 9: Voiceover Script (Start with a strong hook, Pure Tamil)
 PART 10: Hashtag Strategy
 PART 11: Pinned Comment Ideas
 PART 12: Meme / Thumbnail Text Ideas
@@ -123,17 +122,11 @@ Main SEO Keyword: ${safeKeyword || safeTopic || "Tamil trending topic"}
 Content Goal: ${goal}
 Image Context Instruction: ${safeImageInstruction || "If image is uploaded, analyze it and connect it strongly with the topic."}
 
-Must include:
-1. Image-context connection if image is uploaded.
-2. 5 strong hook options.
-3. YouTube searchable title options.
-4. Instagram caption with SEO keywords.
-5. YouTube description with keywords in first 2 lines.
-6. 5-scene Shorts script with scene visual, on-screen text, voiceover, and retention trick.
-7. Pure Tamil voiceover script in PART 9 (must start with a strong hook).
-8. Hashtags separated for YouTube and Instagram.
-9. Pinned comment to increase comments.
-10. Posting tips for better reach.
+Requirements:
+- Make PART 6 (Grok Poster Prompt) extremely detailed for best Grok image results
+- Make PART 7 (Grok Text-to-Video Prompt) cinematic and powerful
+- Make PART 8 (Grok Image-to-Video Prompt) dynamic if image is used
+- Focus on maximum engagement and virality
 `;
 
     const messages = [{ role: "system", content: systemPrompt }];
@@ -159,7 +152,7 @@ Must include:
       body: JSON.stringify({
         model: imageBase64 ? "gpt-4o" : "gpt-4o-mini",
         messages,
-        temperature: highEngagement ? 0.88 : 0.82,   // ← Slightly higher creativity in High Engagement mode
+        temperature: highEngagement ? 0.88 : 0.82,
         max_tokens: 3500
       })
     });
