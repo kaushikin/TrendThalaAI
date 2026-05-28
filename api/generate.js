@@ -59,7 +59,6 @@ module.exports = async (req, res) => {
 
     const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
 
-    // High Engagement Boost
     let engagementBoost = "";
     if (highEngagement) {
       engagementBoost = `
@@ -67,27 +66,23 @@ module.exports = async (req, res) => {
 - Make hooks extremely powerful (shock, curiosity, anger, inspiration)
 - Add pattern interrupts and cliffhangers
 - Make the script more dramatic and fast-paced
-- Focus on maximum watch time and engagement
 `;
     }
 
     const systemPrompt = `
-You are Trend Thala AI — a Tamil-English viral content strategist for YouTube Shorts, Instagram Reels, meme posters, and creator SEO.
-
-Your main job: Create content that improves reach using strong hooks, retention structure, rewatch loops, comment triggers, and Tamil audience psychology.
-
-Tone: Tamil-English mixed, viral Tamil creator style, punchy, clear, emotional when needed.
+You are Trend Thala AI — a Tamil-English viral content strategist for YouTube Shorts and Instagram Reels.
 
 ${engagementBoost}
 
-=== GROK PROMPT RULES (Very Important) ===
-When writing prompts for Grok Image and Grok Video:
-- Be extremely detailed and specific
-- Mention 9:16 vertical format clearly
-- Describe camera movements, lighting, text style, and mood
-- Use cinematic and Tamil cultural references when possible
-- Make poster prompts bold, dramatic, and eye-catching
-- Make video prompts dynamic with fast cuts and emotional pacing
+=== GROK VIDEO PROMPT RULES ===
+Write ONE single, powerful, all-in-one Text-to-Video prompt that includes:
+- Scene descriptions
+- Camera movements
+- Editing effects
+- Text overlays
+- Transitions
+- Pacing
+- Tamil cultural style
 
 Output EXACTLY in this format:
 PART 1: Image Analysis and Context Connection
@@ -95,38 +90,32 @@ PART 2: Viral Hook Options
 PART 3: SEO Keyword Strategy
 PART 4: YouTube Shorts Title Options
 PART 5: YouTube SEO Description
-PART 6: Grok Poster Prompt (9:16 - Very Detailed for Grok Image Generation)
-PART 7: Grok Text-to-Video Prompt (Strong & Cinematic)
-PART 8: Grok Image-to-Video Prompt (If image is used)
-PART 9: Voiceover Script (Start with a strong hook, Pure Tamil)
+PART 6: Grok Poster Prompt (9:16 - Very Detailed)
+PART 7: Grok Text-to-Video Prompt (Single Powerful Prompt - Include all editing, effects, camera, text, transitions)
+PART 8: Instagram Caption + Hashtags
+PART 9: Voiceover Script (Start with strong hook, Pure Tamil)
 PART 10: Hashtag Strategy
 PART 11: Pinned Comment Ideas
-PART 12: Meme / Thumbnail Text Ideas
-PART 13: CapCut Editing Suggestions
-PART 14: Best Posting Strategy
+PART 12: Thumbnail Text Ideas
+PART 13: Best Posting Strategy
 `;
 
     const userPrompt = `
-Create a SEO-optimized viral content pack for Trend Thala AI.
+Create a SEO-optimized viral content pack.
 
-Topic / Headline: ${safeTopic || "Not provided"}
-Key Details: ${safeDetails || "Not provided"}
-Source / Reference Links: ${safeLinks || "Not provided"}
-Special Instructions: ${safeCustom || "Not provided"}
+Topic: ${safeTopic || "Not provided"}
+Details: ${safeDetails || "Not provided"}
+Custom Instructions: ${safeCustom || "Not provided"}
 Mood: ${mood}
-Main Figure: ${safeFigure || "Not provided"}
 Creator Style: ${selectedStyle}
-Target Platform: ${platform}
-Target Audience: ${safeAudience || "Tamil social media audience"}
-Main SEO Keyword: ${safeKeyword || safeTopic || "Tamil trending topic"}
-Content Goal: ${goal}
-Image Context Instruction: ${safeImageInstruction || "If image is uploaded, analyze it and connect it strongly with the topic."}
+Main Keyword: ${safeKeyword || safeTopic}
+Goal: ${goal}
+Image Context: ${safeImageInstruction || "Analyze uploaded image and connect with topic if available"}
 
 Requirements:
-- Make PART 6 (Grok Poster Prompt) extremely detailed for best Grok image results
-- Make PART 7 (Grok Text-to-Video Prompt) cinematic and powerful
-- Make PART 8 (Grok Image-to-Video Prompt) dynamic if image is used
-- Focus on maximum engagement and virality
+- Make PART 7 a single powerful all-in-one Grok Text-to-Video prompt
+- Include editing effects, camera movements, text overlays, and transitions inside PART 7
+- Keep it clean and easy to copy
 `;
 
     const messages = [{ role: "system", content: systemPrompt }];
@@ -135,12 +124,12 @@ Requirements:
       messages.push({
         role: "user",
         content: [
-          { type: "text", text: userPrompt + "\n\nUploaded image is attached. Analyze it carefully and connect it with the topic." },
+          { type: "text", text: userPrompt + "\n\nAnalyze the uploaded image and connect it with the topic." },
           { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } }
         ]
       });
     } else {
-      messages.push({ role: "user", content: userPrompt + "\n\nNo image uploaded. Generate based on topic and details." });
+      messages.push({ role: "user", content: userPrompt });
     }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -160,7 +149,6 @@ Requirements:
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("OpenAI API error:", data);
       return res.status(response.status).json({ success: false, error: data?.error?.message || "OpenAI API failed" });
     }
 
