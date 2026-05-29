@@ -13,7 +13,7 @@
       background: linear-gradient(135deg, #080812, #3b0764, #ff6a00);
       color: white; min-height: 100vh; padding: 12px;
     }
-    .app { max-width: 560px; margin: 0 auto; padding-bottom: 120px; }
+    .app { max-width: 560px; margin: 0 auto; padding-bottom: 100px; }
     .hero { text-align: center; padding: 24px 16px; border-radius: 24px; background: rgba(0,0,0,0.45); margin-bottom: 16px; }
     .logo { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, #ff6a00, #db2777); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; }
     h1 { margin: 0; font-size: 28px; }
@@ -31,9 +31,6 @@
     .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 26px; height: 26px; animation: spin 1s linear infinite; margin: 16px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .copy-btn { margin: 6px 3px; padding: 9px 14px; background: #22c55e; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .record-btn { background: #ef4444; color: white; }
-    .record-btn.recording { background: #b91c1c; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
    
     @media (max-width: 480px) {
       body { padding: 8px; }
@@ -106,6 +103,7 @@
 
       <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral Shorts Pack</button>
       <button class="btn meme-btn" onclick="generateMemePack()" id="memeBtn">😂 Generate Meme Poster Pack</button>
+      <button class="btn" style="background: linear-gradient(45deg, #8b5cf6, #ec4899); margin-top: 8px;" onclick="generateMemePageMode()" id="memePageBtn">😂 Meme Page Mode (Image Only)</button>
       <button class="btn" style="background: linear-gradient(45deg, #ff0000, #ff6a00); margin-top: 8px;" onclick="generateHighEngagement()" id="engagementBtn">🔥 High Engagement Mode</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
       <button class="btn" style="background:#3b82f6;margin-top:8px" onclick="exportAsPDF()">📄 Export as PDF</button>
@@ -113,42 +111,12 @@
       <div class="spinner" id="spinner"></div>
       <div id="output" class="output" style="display:none;"></div>
     </section>
-
-    <!-- Voice Recording + Indic Parler-TTS Section -->
-    <section class="card" style="margin-top: 20px; border: 2px solid #22c55e;">
-      <h3 style="margin: 0 0 12px 0; color: #22c55e;">🎤 Record Your Voice + Voiceover Script</h3>
-      
-      <div style="margin-bottom: 16px;">
-        <button id="recordBtn" class="btn record-btn" onclick="toggleRecording()">🎙️ Record My Voice (5-10 sec)</button>
-        <div id="recordingStatus" style="text-align: center; margin-top: 8px; font-size: 14px; color: #ddd;"></div>
-      
-        <audio id="audioPreview" controls style="width: 100%; margin-top: 10px; display: none;"></audio>
-      
-        <button id="downloadVoiceBtn" class="btn" style="background: #eab308; color: black; margin-top: 8px; display: none;" onclick="downloadRecordedVoice()">
-          ⬇️ Download My Voice Sample
-        </button>
-      </div>
-
-      <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px; margin-bottom: 12px; font-size: 14px;">
-        <strong>Best Free Voiceover Tool:</strong><br><br>
-        <strong>ai4bharat/indic-parler-tts</strong> (Recommended)<br>
-        → Go to: <a href="https://huggingface.co/spaces/ai4bharat/indic-parler-tts" target="_blank" style="color: #22c55e;">Indic Parler-TTS Demo</a><br><br>
-        Paste the **Voiceover Script** from PART 9 (it now starts with a strong hook).
-      </div>
-
-      <button class="btn" style="background: #22c55e; color: black;" onclick="prepareForIndicParler()">
-        📋 Copy Voiceover Script + Instructions
-      </button>
-    </section>
   </div>
 
   <script>
     let finalOutput = "";
     let imageBase64 = null;
     let imageMime = null;
-    let mediaRecorder;
-    let audioChunks = [];
-    let recordedBlob = null;
 
     function useTemplate(type) {
       const topicEl = document.getElementById('topic');
@@ -294,6 +262,40 @@
       btn.innerHTML = "😂 Generate Meme Poster Pack";
     }
 
+    async function generateMemePageMode() {
+      const btn = document.getElementById('memePageBtn');
+      btn.disabled = true;
+      btn.innerHTML = "Generating Meme Page Content...";
+
+      const data = {
+        topic: document.getElementById('topic').value.trim(),
+        details: document.getElementById('details').value.trim(),
+        custom: document.getElementById('custom').value.trim(),
+        mood: document.getElementById('mood').value,
+        figure: document.getElementById('figure').value.trim(),
+        style: "meme",
+        imageBase64, imageMime,
+        memePageMode: true
+      };
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        finalOutput = result.content || "Generation completed.";
+      } catch (e) {
+        finalOutput = "❌ Failed to generate meme page content.";
+      }
+
+      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
+      document.getElementById('output').style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = "😂 Meme Page Mode (Image Only)";
+    }
+
     async function generateHighEngagement() {
       const btn = document.getElementById('engagementBtn');
       btn.disabled = true;
@@ -365,96 +367,6 @@
       doc.text(lines, 20, 35);
       doc.save("Trend_Thala_AI_Pack.pdf");
       alert("✅ PDF Downloaded!");
-    }
-
-    // ==================== VOICE RECORDING ====================
-    let isRecording = false;
-
-    async function toggleRecording() {
-      const recordBtn = document.getElementById('recordBtn');
-      const status = document.getElementById('recordingStatus');
-      const audioPreview = document.getElementById('audioPreview');
-      const downloadBtn = document.getElementById('downloadVoiceBtn');
-
-      if (!isRecording) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
-
-          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-          mediaRecorder.onstop = () => {
-            recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(recordedBlob);
-            audioPreview.src = audioUrl;
-            audioPreview.style.display = 'block';
-            downloadBtn.style.display = 'block';
-            status.innerHTML = "✅ Recording saved! Play the preview above.";
-          };
-
-          mediaRecorder.start();
-          isRecording = true;
-          recordBtn.classList.add('recording');
-          recordBtn.innerHTML = "⏹️ Stop Recording";
-          status.innerHTML = "🔴 Recording... Speak naturally in Tamil (5-10 seconds)";
-        } catch (err) {
-          status.innerHTML = "❌ Microphone permission denied. Please allow microphone access in your browser settings.";
-          alert("❌ Microphone permission denied.\n\nPlease go to your phone's browser settings and allow microphone permission for this site.");
-        }
-      } else {
-        if (mediaRecorder) {
-          mediaRecorder.stop();
-        }
-        isRecording = false;
-        recordBtn.classList.remove('recording');
-        recordBtn.innerHTML = "🎙️ Record My Voice (5-10 sec)";
-        status.innerHTML = "✅ Recording complete! Play the preview above.";
-      }
-    }
-
-    function downloadRecordedVoice() {
-      if (!recordedBlob) return;
-     
-      const url = URL.createObjectURL(recordedBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'my_voice_sample.wav';
-      a.click();
-      URL.revokeObjectURL(url);
-      alert("✅ Voice sample downloaded! Now use it in Indic Parler-TTS.");
-    }
-
-    function prepareForIndicParler() {
-      const voiceMatch = finalOutput.match(/PART 9: Voiceover Script[\s\S]*?(?=PART 10:|$)/i);
-      let script = voiceMatch ? voiceMatch[0].replace(/^PART 9: Voiceover Script\s*/i, '').trim() : "No script found. Generate first!";
-
-      const instructions = `=== INDIC PARLER-TTS VOICEOVER INSTRUCTIONS ===
-
-1. Go to: https://huggingface.co/spaces/ai4bharat/indic-parler-tts
-2. Paste this Voiceover Script (already includes a strong hook):
-
-${script}
-
-3. Recommended Settings:
-   - Speaker: Aditi or Kiran
-   - Style: Natural / Expressive
-   - Speed: Slightly fast (good for Shorts)
-
-4. Click Generate and download the audio.
-
-Tip: The script starts with a hook for better retention!
-`;
-
-      navigator.clipboard.writeText(instructions);
-      alert("✅ Voiceover script + instructions copied!\n\nNow open Indic Parler-TTS and paste it.");
-
-      const blob = new Blob([instructions], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'voiceover_script.txt';
-      a.click();
-      URL.revokeObjectURL(url);
     }
   </script>
 </body>
