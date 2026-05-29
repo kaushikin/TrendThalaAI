@@ -82,6 +82,50 @@
       <img id="imagePreview" class="preview" style="display:none;" />
       <div id="imageCategory" style="margin-top: 8px; font-size: 13px; color: #22c55e;"></div>
 
+      <!-- NEW: 4 Additional Inputs -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+        
+        <!-- 1. Target Platform -->
+        <div>
+          <label>Target Platform</label>
+          <select id="platform">
+            <option value="both">YouTube + Instagram</option>
+            <option value="youtube">YouTube Shorts Only</option>
+            <option value="instagram">Instagram Reels Only</option>
+          </select>
+        </div>
+
+        <!-- 2. Target Audience -->
+        <div>
+          <label>Target Audience</label>
+          <input id="audience" placeholder="18-25 Students / Young Professionals" />
+        </div>
+
+        <!-- 3. Content Goal -->
+        <div>
+          <label>Content Goal</label>
+          <select id="goal">
+            <option value="views">Maximum Views</option>
+            <option value="comments">More Comments</option>
+            <option value="shares">More Shares</option>
+            <option value="saves">More Saves</option>
+            <option value="followers">Gain Followers</option>
+          </select>
+        </div>
+
+        <!-- 4. Tone / Emotion -->
+        <div>
+          <label>Tone / Emotion</label>
+          <select id="tone">
+            <option value="Funny">Funny & Entertaining</option>
+            <option value="Shocking">Shocking & Dramatic</option>
+            <option value="Emotional">Emotional & Heart Touching</option>
+            <option value="Inspirational">Inspirational & Motivational</option>
+            <option value="Serious">Serious & Informative</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Creator Style Dropdown -->
       <div style="margin: 16px 0;">
         <label>Content Style (Creator Style)</label>
@@ -209,6 +253,10 @@
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
         style: document.getElementById('style').value,
+        platform: document.getElementById('platform').value,
+        audience: document.getElementById('audience').value.trim(),
+        goal: document.getElementById('goal').value,
+        tone: document.getElementById('tone').value,
         imageBase64, imageMime
       };
 
@@ -239,8 +287,13 @@
         topic: document.getElementById('topic').value.trim(),
         details: document.getElementById('details').value.trim(),
         custom: document.getElementById('custom').value.trim(),
-        mood: "Powerful",
+        mood: document.getElementById('mood').value,
+        figure: document.getElementById('figure').value.trim(),
         style: "meme",
+        platform: document.getElementById('platform').value,
+        audience: document.getElementById('audience').value.trim(),
+        goal: document.getElementById('goal').value,
+        tone: document.getElementById('tone').value,
         imageBase64, imageMime
       };
 
@@ -274,6 +327,10 @@
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
         style: "meme",
+        platform: document.getElementById('platform').value,
+        audience: document.getElementById('audience').value.trim(),
+        goal: document.getElementById('goal').value,
+        tone: document.getElementById('tone').value,
         imageBase64, imageMime,
         memePageMode: true
       };
@@ -308,6 +365,10 @@
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
         style: document.getElementById('style').value,
+        platform: document.getElementById('platform').value,
+        audience: document.getElementById('audience').value.trim(),
+        goal: document.getElementById('goal').value,
+        tone: document.getElementById('tone').value,
         imageBase64, imageMime,
         highEngagement: true
       };
