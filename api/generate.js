@@ -59,75 +59,73 @@ module.exports = async (req, res) => {
 
     const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
 
-    let engagementBoost = "";
-    if (highEngagement) {
-      engagementBoost = `
-**HIGH ENGAGEMENT MODE ACTIVATED**
-- Make hooks extremely powerful (shock, curiosity, anger, inspiration)
-- Add pattern interrupts and cliffhangers
-- Make the script more dramatic and fast-paced
-- Focus on maximum engagement
+    let modeInstruction = "";
+    if (memePageMode) {
+      modeInstruction = `
+**MEME PAGE MODE ACTIVATED**
+- Focus on funny, relatable, and highly shareable meme content.
+- Make Grok Image Prompt bold and meme-style.
+- Make Text-to-Video Prompt fast-paced with big text and meme energy.
 `;
     }
 
-    let memePageBoost = "";
-    if (memePageMode) {
-      memePageBoost = `
-**MEME PAGE MODE ACTIVATED**
-- Focus only on image-based content
-- Create a powerful and funny Grok Image Prompt
-- High SEO focus for maximum reach
-- No video or voiceover content
+    if (highEngagement) {
+      modeInstruction += `
+**HIGH ENGAGEMENT MODE ACTIVATED**
+- Create extremely powerful emotional hooks.
+- Add strong pattern interrupts and cliffhangers.
+- Focus on maximum retention and engagement.
 `;
     }
 
     const systemPrompt = `
-You are Trend Thala AI — a Tamil-English viral content strategist for YouTube Shorts and Instagram Reels.
+You are an expert Grok Prompt Engineer. Your job is to create highly detailed, structured, and effective prompts for Grok Image and Grok Video generation.
 
-${engagementBoost}
-${memePageBoost}
+${modeInstruction}
 
-Your job: Create highly engaging, SEO-optimized content based on user inputs like platform, audience, goal, and tone.
+### Grok Image Prompt Rules (PART 2):
+- Be extremely detailed about composition, text placement, font style, color, lighting, and mood.
+- Mention 9:16 vertical format.
+- Include bold Tamil text style if needed.
+- Describe visual style (meme, cinematic, dramatic, etc.).
 
-Key Rules:
-- Use the selected platform, audience, goal, and tone when creating content.
-- Make hooks strong and emotional.
-- Focus on maximum reach and engagement.
+### Grok Text-to-Video Prompt Rules (PART 3):
+Write ONE single powerful prompt with clear structure:
+- Break it into scenes (Scene 1, Scene 2, etc.)
+- Mention camera movement for each scene
+- Mention pacing and editing style
+- Mention text overlay instructions
+- Mention transitions and effects
+- Keep total duration around 6-10 seconds for Shorts
+- Make it cinematic but suitable for Tamil meme/viral content
 
 Output EXACTLY in this format:
-PART 1: Image Analysis and Context Connection
-PART 2: Viral Hook Options
-PART 3: SEO Keyword Strategy
-PART 4: YouTube Shorts Title Options
-PART 5: YouTube SEO Description
-PART 6: Grok Poster Prompt (9:16 - Very Detailed)
-PART 7: Grok Text-to-Video Prompt (Single Powerful Prompt)
-PART 8: Instagram Caption + Hashtags
-PART 9: Voiceover Script (Start with strong hook, Pure Tamil)
-PART 10: Hashtag Strategy
-PART 11: Pinned Comment Ideas
-PART 12: Thumbnail Text Ideas
-PART 13: Best Posting Strategy
+
+PART 1: Meme / Content Concept
+PART 2: Grok Image Prompt (9:16 Vertical - Highly Detailed)
+PART 3: Grok Text-to-Video Prompt (Single Powerful Structured Prompt)
+PART 4: Grok Voiceover Script (Strong Hook + Natural Tamil)
+PART 5: YouTube Title Options (SEO Optimized)
+PART 6: YouTube Description
+PART 7: Instagram Caption + Hashtags
+PART 8: Thumbnail Text Ideas
 `;
 
     const userPrompt = `
-Create SEO-optimized viral content.
+Create high-quality, ready-to-paste Grok prompts.
 
-Topic / Headline: ${safeTopic || "Not provided"}
-Key Details: ${safeDetails || "Not provided"}
-Source / Reference Links: ${safeLinks || "Not provided"}
-Special Instructions: ${safeCustom || "Not provided"}
+Topic: ${safeTopic || "Not provided"}
+Details: ${safeDetails || "Not provided"}
+Custom Instructions: ${safeCustom || "Not provided"}
 Mood: ${mood}
 Main Figure: ${safeFigure || "Not provided"}
 Creator Style: ${selectedStyle}
 Target Platform: ${platform}
 Target Audience: ${safeAudience || "Tamil social media audience"}
 Content Goal: ${safeGoal}
-Tone / Emotion: ${safeTone}
+Tone: ${safeTone}
 
-Requirements:
-- Use the selected platform, audience, goal, and tone while creating content.
-- Make content highly engaging and optimized for the chosen goal.
+Generate detailed and structured Grok prompts following the rules above.
 `;
 
     const messages = [{ role: "system", content: systemPrompt }];
@@ -136,7 +134,7 @@ Requirements:
       messages.push({
         role: "user",
         content: [
-          { type: "text", text: userPrompt + "\n\nAnalyze the uploaded image and connect it with the topic." },
+          { type: "text", text: userPrompt + "\n\nAnalyze the uploaded image and create prompts based on it." },
           { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } }
         ]
       });
@@ -153,8 +151,8 @@ Requirements:
       body: JSON.stringify({
         model: imageBase64 ? "gpt-4o" : "gpt-4o-mini",
         messages,
-        temperature: highEngagement ? 0.88 : 0.82,
-        max_tokens: 3500
+        temperature: 0.85,
+        max_tokens: 4000
       })
     });
 
