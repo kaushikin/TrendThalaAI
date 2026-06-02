@@ -61,49 +61,33 @@ module.exports = async (req, res) => {
 
     let modeInstruction = "";
     if (memePageMode) {
-      modeInstruction = `
-**MEME PAGE MODE ACTIVATED**
-- Focus on funny, relatable, and highly shareable meme content.
-- Make Grok Image Prompt bold and meme-style.
-- Make Text-to-Video Prompt fast-paced with big text and meme energy.
-`;
+      modeInstruction = `**MEME PAGE MODE ACTIVATED** - Focus on funny, shareable meme content and bold poster regeneration.`;
     }
-
     if (highEngagement) {
-      modeInstruction += `
-**HIGH ENGAGEMENT MODE ACTIVATED**
-- Create extremely powerful emotional hooks.
-- Add strong pattern interrupts and cliffhangers.
-- Focus on maximum retention and engagement.
-`;
+      modeInstruction += `**HIGH ENGAGEMENT MODE ACTIVATED** - Create powerful hooks and high-retention content.`;
     }
 
     const systemPrompt = `
-You are an expert Grok Prompt Engineer. Your job is to create highly detailed, structured, and effective prompts for Grok Image and Grok Video generation.
+You are an expert Grok Prompt Engineer specialized in image repurposing and viral content creation for Tamil YouTube Shorts and Instagram.
 
 ${modeInstruction}
 
-### Grok Image Prompt Rules (PART 2):
-- Be extremely detailed about composition, text placement, font style, color, lighting, and mood.
-- Mention 9:16 vertical format.
-- Include bold Tamil text style if needed.
-- Describe visual style (meme, cinematic, dramatic, etc.).
+### Image Repurposing Rules (Very Important):
+When an image is uploaded:
+- Carefully analyze the uploaded image (visual elements, text, emotion, composition, style, colors).
+- Create a **new and improved poster version** in PART 2 (Grok Image Prompt).
+- Make the regenerated poster better than the original (better text placement, stronger visual impact, more engaging for Shorts/Reels).
+- Connect the image strongly with the given topic and details.
 
-### Grok Text-to-Video Prompt Rules (PART 3):
-Write ONE single powerful prompt with clear structure:
-- Break it into scenes (Scene 1, Scene 2, etc.)
-- Mention camera movement for each scene
-- Mention pacing and editing style
-- Mention text overlay instructions
-- Mention transitions and effects
-- Keep total duration around 6-10 seconds for Shorts
-- Make it cinematic but suitable for Tamil meme/viral content
+### Grok Prompt Rules:
+- PART 2 (Image Prompt): Highly detailed for Grok image generation (9:16 vertical).
+- PART 3 (Text-to-Video Prompt): One powerful structured prompt with scenes, camera, text overlays, and effects.
 
 Output EXACTLY in this format:
 
-PART 1: Meme / Content Concept
-PART 2: Grok Image Prompt (9:16 Vertical - Highly Detailed)
-PART 3: Grok Text-to-Video Prompt (Single Powerful Structured Prompt)
+PART 1: Image Analysis & Repurposing Idea
+PART 2: Grok Image Prompt (Regenerated Poster - 9:16 Vertical)
+PART 3: Grok Text-to-Video Prompt (Single Powerful Prompt)
 PART 4: Grok Voiceover Script (Strong Hook + Natural Tamil)
 PART 5: YouTube Title Options (SEO Optimized)
 PART 6: YouTube Description
@@ -112,7 +96,7 @@ PART 8: Thumbnail Text Ideas
 `;
 
     const userPrompt = `
-Create high-quality, ready-to-paste Grok prompts.
+${imageBase64 ? "An image has been uploaded. Analyze it carefully and regenerate a better poster version." : ""}
 
 Topic: ${safeTopic || "Not provided"}
 Details: ${safeDetails || "Not provided"}
@@ -125,7 +109,7 @@ Target Audience: ${safeAudience || "Tamil social media audience"}
 Content Goal: ${safeGoal}
 Tone: ${safeTone}
 
-Generate detailed and structured Grok prompts following the rules above.
+Generate high-quality Grok prompts focused on image repurposing and viral posting content.
 `;
 
     const messages = [{ role: "system", content: systemPrompt }];
@@ -134,7 +118,7 @@ Generate detailed and structured Grok prompts following the rules above.
       messages.push({
         role: "user",
         content: [
-          { type: "text", text: userPrompt + "\n\nAnalyze the uploaded image and create prompts based on it." },
+          { type: "text", text: userPrompt },
           { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } }
         ]
       });
