@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trend Thala AI - Shorts Only</title>
+  <title>Trend Thala AI - Grok Prompt Generator</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -16,8 +16,8 @@
     .app { max-width: 560px; margin: 0 auto; padding-bottom: 100px; }
     .hero { text-align: center; padding: 24px 16px; border-radius: 24px; background: rgba(0,0,0,0.45); margin-bottom: 16px; }
     .logo { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, #ff6a00, #db2777); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; }
-    h1 { margin: 0; font-size: 28px; }
-    .tagline { font-size: 15px; color: #ddd; margin-top: 6px; }
+    h1 { margin: 0; font-size: 26px; }
+    .tagline { font-size: 14px; color: #ddd; margin-top: 6px; }
     .card { margin-top: 14px; padding: 20px; border-radius: 20px; background: rgba(0,0,0,0.45); }
     label { display: block; font-weight: bold; margin: 14px 0 6px; font-size: 14px; }
     input, textarea, select { width: 100%; padding: 12px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111; }
@@ -35,7 +35,7 @@
     @media (max-width: 480px) {
       body { padding: 8px; }
       .card { padding: 16px; }
-      h1 { font-size: 26px; }
+      h1 { font-size: 24px; }
       .logo { width: 70px; height: 70px; font-size: 28px; }
     }
   </style>
@@ -45,11 +45,11 @@
     <section class="hero">
       <div class="logo">TT</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">YouTube Shorts Only • Mr Tamilan Style</p>
+      <p class="tagline">Grok Prompt Generator • YouTube Shorts + Instagram</p>
     </section>
 
     <section class="card">
-      <div class="section-title">Create Viral YouTube Short</div>
+      <div class="section-title">Create Viral YouTube Short / Reel</div>
 
       <!-- Quick Templates -->
       <div style="margin-bottom: 12px;">
@@ -82,10 +82,9 @@
       <img id="imagePreview" class="preview" style="display:none;" />
       <div id="imageCategory" style="margin-top: 8px; font-size: 13px; color: #22c55e;"></div>
 
-      <!-- NEW: 4 Additional Inputs -->
+      <!-- Additional Inputs -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
         
-        <!-- 1. Target Platform -->
         <div>
           <label>Target Platform</label>
           <select id="platform">
@@ -95,13 +94,11 @@
           </select>
         </div>
 
-        <!-- 2. Target Audience -->
         <div>
           <label>Target Audience</label>
           <input id="audience" placeholder="18-25 Students / Young Professionals" />
         </div>
 
-        <!-- 3. Content Goal -->
         <div>
           <label>Content Goal</label>
           <select id="goal">
@@ -113,7 +110,6 @@
           </select>
         </div>
 
-        <!-- 4. Tone / Emotion -->
         <div>
           <label>Tone / Emotion</label>
           <select id="tone">
@@ -126,7 +122,7 @@
         </div>
       </div>
 
-      <!-- Creator Style Dropdown -->
+      <!-- Creator Style -->
       <div style="margin: 16px 0;">
         <label>Content Style (Creator Style)</label>
         <select id="style" style="width: 100%; padding: 12px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111;">
@@ -145,9 +141,10 @@
         <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
       </div>
 
-      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Viral Shorts Pack</button>
-      <button class="btn meme-btn" onclick="generateMemePack()" id="memeBtn">😂 Generate Meme Poster Pack</button>
-      <button class="btn" style="background: linear-gradient(45deg, #8b5cf6, #ec4899); margin-top: 8px;" onclick="generateMemePageMode()" id="memePageBtn">😂 Meme Page Mode (Image Only)</button>
+      <!-- Action Buttons -->
+      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Grok Prompts</button>
+      <button class="btn meme-btn" onclick="generateMemePack()" id="memeBtn">😂 Generate Meme Poster Prompts</button>
+      <button class="btn" style="background: linear-gradient(45deg, #8b5cf6, #ec4899); margin-top: 8px;" onclick="generateMemePageMode()" id="memePageBtn">😂 Meme Page Mode (Image Focus)</button>
       <button class="btn" style="background: linear-gradient(45deg, #ff0000, #ff6a00); margin-top: 8px;" onclick="generateHighEngagement()" id="engagementBtn">🔥 High Engagement Mode</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
       <button class="btn" style="background:#3b82f6;margin-top:8px" onclick="exportAsPDF()">📄 Export as PDF</button>
@@ -281,7 +278,7 @@
     async function generateMemePack() {
       const btn = document.getElementById('memeBtn');
       btn.disabled = true;
-      btn.innerHTML = "Generating Meme Poster...";
+      btn.innerHTML = "Generating Meme Poster Prompts...";
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -304,21 +301,21 @@
           body: JSON.stringify(data)
         });
         const result = await res.json();
-        finalOutput = result.content || "Meme generation completed.";
+        finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ Failed to generate meme pack.";
+        finalOutput = "❌ Failed to generate meme poster prompts.";
       }
 
       document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
       document.getElementById('output').style.display = 'block';
       btn.disabled = false;
-      btn.innerHTML = "😂 Generate Meme Poster Pack";
+      btn.innerHTML = "😂 Generate Meme Poster Prompts";
     }
 
     async function generateMemePageMode() {
       const btn = document.getElementById('memePageBtn');
       btn.disabled = true;
-      btn.innerHTML = "Generating Meme Page Content...";
+      btn.innerHTML = "Generating Meme Page Prompts...";
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -344,19 +341,19 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ Failed to generate meme page content.";
+        finalOutput = "❌ Failed to generate meme page prompts.";
       }
 
       document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
       document.getElementById('output').style.display = 'block';
       btn.disabled = false;
-      btn.innerHTML = "😂 Meme Page Mode (Image Only)";
+      btn.innerHTML = "😂 Meme Page Mode (Image Focus)";
     }
 
     async function generateHighEngagement() {
       const btn = document.getElementById('engagementBtn');
       btn.disabled = true;
-      btn.innerHTML = "Generating High Engagement Content...";
+      btn.innerHTML = "Generating High Engagement Prompts...";
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -382,7 +379,7 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ Failed to generate high engagement content.";
+        finalOutput = "❌ Failed to generate high engagement prompts.";
       }
 
       document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
@@ -422,11 +419,11 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text("Trend Thala AI - Shorts Pack", 20, 20);
+      doc.text("Trend Thala AI - Grok Prompts", 20, 20);
       doc.setFontSize(11);
       const lines = doc.splitTextToSize(finalOutput, 170);
       doc.text(lines, 20, 35);
-      doc.save("Trend_Thala_AI_Pack.pdf");
+      doc.save("Trend_Thala_AI_Prompts.pdf");
       alert("✅ PDF Downloaded!");
     }
   </script>
