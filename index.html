@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trend Thala AI - Grok Prompt Generator</title>
+  <title>Trend Thala AI • Expert Grok Prompt Generator</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -13,28 +13,28 @@
       background: linear-gradient(135deg, #080812, #3b0764, #ff6a00);
       color: white; min-height: 100vh; padding: 12px;
     }
-    .app { max-width: 560px; margin: 0 auto; padding-bottom: 100px; }
+    .app { max-width: 580px; margin: 0 auto; padding-bottom: 100px; }
     .hero { text-align: center; padding: 24px 16px; border-radius: 24px; background: rgba(0,0,0,0.45); margin-bottom: 16px; }
     .logo { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, #ff6a00, #db2777); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; }
     h1 { margin: 0; font-size: 26px; }
     .tagline { font-size: 14px; color: #ddd; margin-top: 6px; }
-    .card { margin-top: 14px; padding: 20px; border-radius: 20px; background: rgba(0,0,0,0.45); }
+    .card { margin-top: 14px; padding: 22px; border-radius: 20px; background: rgba(0,0,0,0.45); }
     label { display: block; font-weight: bold; margin: 14px 0 6px; font-size: 14px; }
-    input, textarea, select { width: 100%; padding: 12px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111; }
-    textarea { min-height: 75px; }
-    .btn { width: 100%; padding: 15px; margin: 10px 0 6px; border: none; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; }
+    input, textarea, select { width: 100%; padding: 13px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111; }
+    textarea { min-height: 80px; }
+    .btn { width: 100%; padding: 16px; margin: 10px 0 6px; border: none; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; }
     .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
     .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
     .meme-btn { background: linear-gradient(45deg, #ec4899, #f97316); }
-    .output { margin-top: 16px; background: rgba(0,0,0,0.5); padding: 16px; border-radius: 14px; line-height: 1.6; font-size: 14.5px; white-space: pre-wrap; }
+    .output { margin-top: 16px; background: rgba(0,0,0,0.5); padding: 18px; border-radius: 14px; line-height: 1.65; font-size: 14.5px; white-space: pre-wrap; }
     .preview { max-width: 100%; border-radius: 12px; margin: 10px 0; border: 3px solid #ff6a00; }
-    .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 26px; height: 26px; animation: spin 1s linear infinite; margin: 16px auto; }
+    .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; margin: 18px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .copy-btn { margin: 6px 3px; padding: 9px 14px; background: #22c55e; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
+    .copy-btn { margin: 6px 3px; padding: 10px 15px; background: #22c55e; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
    
     @media (max-width: 480px) {
       body { padding: 8px; }
-      .card { padding: 16px; }
+      .card { padding: 18px; }
       h1 { font-size: 24px; }
       .logo { width: 70px; height: 70px; font-size: 28px; }
     }
@@ -45,14 +45,14 @@
     <section class="hero">
       <div class="logo">TT</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">Grok Prompt Generator • YouTube Shorts + Instagram</p>
+      <p class="tagline">Expert Grok Prompt Generator • 100% Premium Quality</p>
     </section>
 
     <section class="card">
-      <div class="section-title">Create Viral YouTube Short / Reel</div>
+      <div class="section-title">Create High-Quality Content</div>
 
       <!-- Quick Templates -->
-      <div style="margin-bottom: 12px;">
+      <div style="margin-bottom: 14px;">
         <label>Quick Templates</label>
         <div style="display: flex; flex-wrap: wrap; gap: 6px;">
           <button class="preset-btn" onclick="useTemplate('movie')">🎬 Movie</button>
@@ -62,28 +62,30 @@
           <button class="preset-btn" onclick="useTemplate('tech')">💻 Tech</button>
           <button class="preset-btn" onclick="useTemplate('motivational')">🔥 Motivational</button>
           <button class="preset-btn" onclick="useTemplate('meme')">😂 Meme Style</button>
+          <button class="preset-btn" onclick="useTemplate('clothing')">👕 Clothing / Fashion</button>
+          <button class="preset-btn" onclick="useTemplate('unique')">✨ Unique Product</button>
         </div>
       </div>
 
-      <label>Topic / News Headline</label>
-      <input id="topic" placeholder="விஜய் became CM shock" />
+      <label>Topic / Product Name / Headline</label>
+      <input id="topic" placeholder="Example: Premium Cotton Shirt for Men" />
 
-      <label>Key Details</label>
-      <textarea id="details" placeholder="முக்கிய points..."></textarea>
+      <label>Key Details / Product Description</label>
+      <textarea id="details" placeholder="Fabric, features, price, offers..."></textarea>
 
-      <label>Source / Reference Links</label>
-      <textarea id="links" placeholder="https://..."></textarea>
+      <label>Product Link (Amazon / Flipkart)</label>
+      <input id="links" placeholder="Paste Amazon or Flipkart product link here" />
 
       <label>Special Instructions</label>
-      <textarea id="custom" placeholder="Make it super shocking and meaningful"></textarea>
+      <textarea id="custom" placeholder="Example: Focus on styling, budget friendly, summer wear..."></textarea>
 
-      <label>Reference Image (Optional - Best for Memes)</label>
+      <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
       <img id="imagePreview" class="preview" style="display:none;" />
       <div id="imageCategory" style="margin-top: 8px; font-size: 13px; color: #22c55e;"></div>
 
       <!-- Additional Inputs -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
         
         <div>
           <label>Target Platform</label>
@@ -96,7 +98,7 @@
 
         <div>
           <label>Target Audience</label>
-          <input id="audience" placeholder="18-25 Students / Young Professionals" />
+          <input id="audience" placeholder="18-30 Youth / College Students" />
         </div>
 
         <div>
@@ -106,7 +108,7 @@
             <option value="comments">More Comments</option>
             <option value="shares">More Shares</option>
             <option value="saves">More Saves</option>
-            <option value="followers">Gain Followers</option>
+            <option value="affiliate">Affiliate Sales / Clicks</option>
           </select>
         </div>
 
@@ -117,34 +119,34 @@
             <option value="Shocking">Shocking & Dramatic</option>
             <option value="Emotional">Emotional & Heart Touching</option>
             <option value="Inspirational">Inspirational & Motivational</option>
-            <option value="Serious">Serious & Informative</option>
+            <option value="Serious">Serious & Trustworthy</option>
           </select>
         </div>
       </div>
 
       <!-- Creator Style -->
       <div style="margin: 16px 0;">
-        <label>Content Style (Creator Style)</label>
-        <select id="style" style="width: 100%; padding: 12px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111;">
-          <option value="mr-tamilan">Mr Tamilan (Default - Energetic)</option>
+        <label>Content Style</label>
+        <select id="style" style="width: 100%; padding: 13px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111;">
+          <option value="mr-tamilan">Mr Tamilan (Energetic & Punchy)</option>
           <option value="behindwoods">Behindwoods (Professional)</option>
-          <option value="cinema-vikatan">Cinema Vikatan (Spicy Gossip)</option>
-          <option value="star-sports">Star Sports Tamil (Passionate)</option>
-          <option value="tech-satish">Tech Satish (Clear Tech)</option>
-          <option value="tamil-motivational">Tamil Motivational (Inspiring)</option>
-          <option value="meme">Balanced Meme Style (Funny + Educative + Meaningful)</option>
+          <option value="cinema-vikatan">Cinema Vikatan (Spicy)</option>
+          <option value="star-sports">Star Sports (Passionate)</option>
+          <option value="tech-satish">Tech Satish (Clear)</option>
+          <option value="tamil-motivational">Tamil Motivational</option>
+          <option value="meme">Meme Style (Funny & Relatable)</option>
         </select>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div><label>Mood</label><select id="mood"><option>Dramatic</option><option>Shocking</option><option>Emotional</option><option>Funny</option><option>Powerful</option></select></div>
-        <div><label>Main Figure</label><input id="figure" placeholder="Vijay / Modi" /></div>
+        <div><label>Main Figure / Model</label><input id="figure" placeholder="Model name or description" /></div>
       </div>
 
-      <!-- Action Buttons -->
-      <button class="btn primary" onclick="generatePack()" id="generateBtn">🤖 Generate Grok Prompts</button>
-      <button class="btn meme-btn" onclick="generateMemePack()" id="memeBtn">😂 Generate Meme Poster Prompts</button>
-      <button class="btn" style="background: linear-gradient(45deg, #8b5cf6, #ec4899); margin-top: 8px;" onclick="generateMemePageMode()" id="memePageBtn">😂 Meme Page Mode (Image Focus)</button>
+      <!-- Buttons -->
+      <button class="btn primary" onclick="generatePack()" id="generateBtn">🚀 Generate Expert Prompts</button>
+      <button class="btn meme-btn" onclick="generateMemePack()" id="memeBtn">😂 Meme Poster Prompts</button>
+      <button class="btn" style="background: linear-gradient(45deg, #8b5cf6, #ec4899); margin-top: 8px;" onclick="generateMemePageMode()" id="memePageBtn">🛍️ Affiliate Product Mode</button>
       <button class="btn" style="background: linear-gradient(45deg, #ff0000, #ff6a00); margin-top: 8px;" onclick="generateHighEngagement()" id="engagementBtn">🔥 High Engagement Mode</button>
       <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
       <button class="btn" style="background:#3b82f6;margin-top:8px" onclick="exportAsPDF()">📄 Export as PDF</button>
@@ -162,25 +164,19 @@
     function useTemplate(type) {
       const topicEl = document.getElementById('topic');
       const detailsEl = document.getElementById('details');
-     
-      if (type === 'movie') {
+      
+      if (type === 'clothing') {
+        topicEl.value = "Premium Cotton Shirt for Men - Summer 2026";
+        detailsEl.value = "Breathable cotton, slim fit, multiple colors, perfect for office and casual wear";
+      } else if (type === 'unique') {
+        topicEl.value = "Portable Mini Projector for Mobile Phones";
+        detailsEl.value = "HD quality, built-in speaker, easy to carry, best for travel and home entertainment";
+      } else if (type === 'movie') {
         topicEl.value = "Vijay's new movie creates record opening";
         detailsEl.value = "Vijay's latest film breaks box office records";
       } else if (type === 'politics') {
         topicEl.value = "Vijay TVK meeting creates huge buzz";
         detailsEl.value = "Vijay addresses massive crowd in Chennai";
-      } else if (type === 'gossip') {
-        topicEl.value = "Suriya comeback after 13 years shocks industry";
-        detailsEl.value = "Suriya returns with powerful role";
-      } else if (type === 'cricket') {
-        topicEl.value = "MS Dhoni's new record creates history";
-        detailsEl.value = "Dhoni breaks another record in IPL";
-      } else if (type === 'tech') {
-        topicEl.value = "Tamil Nadu startup gets $100 million funding";
-        detailsEl.value = "Chennai-based startup becomes unicorn";
-      } else if (type === 'motivational') {
-        topicEl.value = "From daily wage worker to IAS officer";
-        detailsEl.value = "Inspiring journey of determination";
       } else if (type === 'meme') {
         topicEl.value = "This one thing changed everything";
         detailsEl.value = "Funny but powerful life lesson";
@@ -188,52 +184,22 @@
       }
     }
 
-    function resizeImage(file, maxWidth = 1024, quality = 0.75) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        const reader = new FileReader();
-        reader.onload = e => {
-          img.onload = () => {
-            let width = img.width;
-            let height = img.height;
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL('image/jpeg', quality);
-            resolve({
-              dataUrl,
-              base64: dataUrl.split(',')[1],
-              mime: 'image/jpeg'
-            });
-          };
-          img.onerror = reject;
-          img.src = e.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
     document.getElementById('imageUpload').addEventListener('change', async e => {
       const file = e.target.files[0];
       if (!file) return;
       try {
-        document.getElementById('imageCategory').innerText = "⏳ Optimizing image for AI...";
-        const optimized = await resizeImage(file, 1024, 0.75);
-        imageBase64 = optimized.base64;
-        imageMime = optimized.mime;
-        document.getElementById('imagePreview').src = optimized.dataUrl;
-        document.getElementById('imagePreview').style.display = 'block';
-        document.getElementById('imageCategory').innerText = "✅ Image ready for AI analysis";
+        document.getElementById('imageCategory').innerText = "⏳ Optimizing image...";
+        const reader = new FileReader();
+        reader.onload = ev => {
+          imageBase64 = ev.target.result.split(',')[1];
+          imageMime = file.type;
+          document.getElementById('imagePreview').src = ev.target.result;
+          document.getElementById('imagePreview').style.display = 'block';
+          document.getElementById('imageCategory').innerText = "✅ Image ready";
+        };
+        reader.readAsDataURL(file);
       } catch (err) {
-        console.error(err);
-        document.getElementById('imageCategory').innerText = "❌ Image processing failed. Try another image.";
+        document.getElementById('imageCategory').innerText = "❌ Image processing failed";
       }
     });
 
@@ -278,7 +244,7 @@
     async function generateMemePack() {
       const btn = document.getElementById('memeBtn');
       btn.disabled = true;
-      btn.innerHTML = "Generating Meme Poster Prompts...";
+      btn.innerHTML = "Generating...";
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -303,23 +269,24 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ Failed to generate meme poster prompts.";
+        finalOutput = "❌ Failed.";
       }
 
       document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
       document.getElementById('output').style.display = 'block';
       btn.disabled = false;
-      btn.innerHTML = "😂 Generate Meme Poster Prompts";
+      btn.innerHTML = "😂 Meme Poster Prompts";
     }
 
     async function generateMemePageMode() {
       const btn = document.getElementById('memePageBtn');
       btn.disabled = true;
-      btn.innerHTML = "Generating Meme Page Prompts...";
+      btn.innerHTML = "Generating...";
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
         details: document.getElementById('details').value.trim(),
+        links: document.getElementById('links').value.trim(),
         custom: document.getElementById('custom').value.trim(),
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
@@ -341,19 +308,19 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ Failed to generate meme page prompts.";
+        finalOutput = "❌ Failed.";
       }
 
       document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
       document.getElementById('output').style.display = 'block';
       btn.disabled = false;
-      btn.innerHTML = "😂 Meme Page Mode (Image Focus)";
+      btn.innerHTML = "🛍️ Affiliate Product Mode";
     }
 
     async function generateHighEngagement() {
       const btn = document.getElementById('engagementBtn');
       btn.disabled = true;
-      btn.innerHTML = "Generating High Engagement Prompts...";
+      btn.innerHTML = "Generating...";
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
@@ -379,7 +346,7 @@
         const result = await res.json();
         finalOutput = result.content || "Generation completed.";
       } catch (e) {
-        finalOutput = "❌ Failed to generate high engagement prompts.";
+        finalOutput = "❌ Failed.";
       }
 
       document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
@@ -389,7 +356,7 @@
     }
 
     function formatWithCopyButtons(text) {
-      let html = `<div style="background:rgba(0,0,0,0.4);padding:16px;border-radius:12px;">${text}</div>`;
+      let html = `<div style="background:rgba(0,0,0,0.4);padding:18px;border-radius:14px;">${text}</div>`;
       const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
       parts.forEach((part, i) => {
         const num = i + 1;
@@ -419,7 +386,7 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text("Trend Thala AI - Grok Prompts", 20, 20);
+      doc.text("Trend Thala AI - Expert Prompts", 20, 20);
       doc.setFontSize(11);
       const lines = doc.splitTextToSize(finalOutput, 170);
       doc.text(lines, 20, 35);
