@@ -129,6 +129,14 @@
             <option value="Serious">Serious & Trustworthy</option>
           </select>
         </div>
+        <div>
+          <label>Voiceover Language</label>
+          <select id="voiceoverLanguage">
+            <option value="tanglish">Tanglish (Tamil + English mix)</option>
+            <option value="tamil">Pure Tamil (தமிழ்)</option>
+            <option value="english">English</option>
+          </select>
+        </div>
       </div>
 
       <label>Content Style</label>
@@ -281,6 +289,7 @@
         audience: document.getElementById('audience').value.trim(),
         goal: document.getElementById('goal').value,
         tone: document.getElementById('tone').value,
+        voiceoverLanguage: document.getElementById('voiceoverLanguage').value,
         contentAngle: document.getElementById('contentAngle') ? document.getElementById('contentAngle').value : 'auto',
         imageBase64, imageMime,
         memePageMode: modes.meme,
