@@ -27,6 +27,7 @@ module.exports = async (req, res) => {
       goal = "views",
       tone = "Funny",
       contentAngle = "auto",
+      voiceoverLanguage = "tamil",
       imageBase64 = null,
       imageMime = null,
       highEngagement = false,
@@ -45,6 +46,9 @@ module.exports = async (req, res) => {
     const safeGoal = clean(goal, 60);
     const safeTone = clean(tone, 60);
     const safeAngle = clean(contentAngle, 60);
+    const safeVoiceLang = ["tamil", "english", "tanglish"].includes(String(voiceoverLanguage).toLowerCase())
+      ? String(voiceoverLanguage).toLowerCase()
+      : "tamil";
 
     if (!safeTopic && !safeDetails && !imageBase64) {
       return res.status(400).json({ success: false, error: "Please provide a topic, details, or image." });
@@ -68,6 +72,14 @@ module.exports = async (req, res) => {
       "meme": "Funny, relatable, shareable, meme-style content."
     };
     const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
+
+    const voiceLangMap = {
+      tamil: `Write voiceover_script almost entirely in Tamil script (தமிழ்), with only unavoidable English brand/product/tech terms left in English. For audiences who read/speak pure Tamil.`,
+      english: `Write voiceover_script entirely in English. For audiences who prefer English content (pan-India / NRI / English-speaking viewers).`,
+      tanglish: `Write voiceover_script in natural Tanglish (mixed Tamil + English, in Latin script), matching how young Tamil creators actually speak. Default for general Tamil social media audiences.`
+    };
+    const voiceLanguageInstruction = voiceLangMap[safeVoiceLang] || voiceLangMap.tamil;
+
 
     const angleMap = {
       styling: `Use the "3 Ways to Style This" structure: open on the item, then show 3 quick styling/usage variations, end on the best/favorite one.`,
@@ -136,14 +148,14 @@ You must respond with ONLY a single valid JSON object — no markdown fences, no
 }
 
 === VOICEOVER RULES (voiceover_script) ===
+- LANGUAGE: ${voiceLanguageInstruction}
 - The opening hook (first 2-4 seconds, roughly 8-12 words MAX) must use ONE of these patterns:
   1. Direct question to viewer ("Idha vachu paathaala?")
   2. Bold claim / shock fact ("Ithu 299 dhaan, aana...")
   3. Pattern interrupt / contradiction ("Ellarum ithai thappa pannranga")
   4. Direct address / "stop scrolling" style
   5. Before-you-buy warning ("Itha vaangurathuku munnadi itha paarunga")
-- Total script should be roughly 25-35 Tamil/Tanglish words (matches a 10-second video at natural pace).
-- Mix Tamil and English naturally (Tanglish), matching the selected Creator Style.
+- Total script should be roughly 25-35 words (matches a 10-second video at natural pace), adjusted naturally for the chosen language above.
 - End with either a comment/follow/save CTA, or a curiosity-gap line.
 - Example hook style for reference (do not copy verbatim, match the energy):
   "Bro, idha 3 naal use pannitu sொnnen — life changed!"
