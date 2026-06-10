@@ -13,28 +13,44 @@
       background: linear-gradient(135deg, #080812, #3b0764, #ff6a00);
       color: white; min-height: 100vh; padding: 12px;
     }
-    .app { max-width: 580px; margin: 0 auto; padding-bottom: 100px; }
+    .app { max-width: 600px; margin: 0 auto; padding-bottom: 100px; }
     .hero { text-align: center; padding: 24px 16px; border-radius: 24px; background: rgba(0,0,0,0.45); margin-bottom: 16px; }
     .logo { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 50%; background: linear-gradient(135deg, #ff6a00, #db2777); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; }
     h1 { margin: 0; font-size: 26px; }
     .tagline { font-size: 14px; color: #ddd; margin-top: 6px; }
     .card { margin-top: 14px; padding: 22px; border-radius: 20px; background: rgba(0,0,0,0.45); }
     label { display: block; font-weight: bold; margin: 14px 0 6px; font-size: 14px; }
+    .hint { font-size: 12px; color: #bbb; margin-top: 4px; }
     input, textarea, select { width: 100%; padding: 13px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111; }
     textarea { min-height: 80px; }
     .btn { width: 100%; padding: 16px; margin: 10px 0 6px; border: none; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; }
     .primary { background: linear-gradient(45deg, #ff6a00, #ff004c); }
     .secondary { background: linear-gradient(45deg, #7c3aed, #db2777); }
     .meme-btn { background: linear-gradient(45deg, #ec4899, #f97316); }
-    .output { margin-top: 16px; background: rgba(0,0,0,0.5); padding: 18px; border-radius: 14px; line-height: 1.65; font-size: 14.5px; white-space: pre-wrap; }
     .preview { max-width: 100%; border-radius: 12px; margin: 10px 0; border: 3px solid #ff6a00; }
     .spinner { display: none; border: 5px solid #f3f3f3; border-top: 5px solid #ff6a00; border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; margin: 18px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .copy-btn { margin: 6px 3px; padding: 10px 15px; background: #22c55e; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
-   
+
+    .preset-btn { padding: 6px 10px; border-radius: 10px; border: none; background: rgba(255,255,255,0.15); color: white; font-size: 12px; cursor: pointer; }
+
+    .toggle-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .toggle-btn { flex: 1; min-width: 120px; padding: 10px; border-radius: 12px; border: 2px solid transparent; background: rgba(255,255,255,0.1); color: #ddd; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .toggle-btn.active { border-color: #22c55e; background: rgba(34,197,94,0.2); color: #fff; }
+
+    .banner { background: rgba(234,179,8,0.15); border: 1px solid #eab308; padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-top: 10px; color: #fde68a; }
+    .error-banner { background: rgba(239,68,68,0.15); border: 1px solid #ef4444; padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-top: 10px; color: #fecaca; }
+
+    .result-card { margin-top: 14px; background: rgba(0,0,0,0.5); padding: 16px; border-radius: 14px; }
+    .result-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #22c55e; text-transform: uppercase; letter-spacing: 0.5px; }
+    .result-content { white-space: pre-wrap; line-height: 1.6; font-size: 14.5px; }
+    .copy-btn { margin-top: 10px; padding: 9px 14px; background: #22c55e; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; }
+    .video-hint { font-size: 12px; color: #93c5fd; margin-top: 8px; background: rgba(59,130,246,0.1); padding: 8px 10px; border-radius: 8px; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .chip { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+
     @media (max-width: 480px) {
       body { padding: 8px; }
-      .card { padding: 18px; }
+      .card { padding: 16px; }
       h1 { font-size: 24px; }
       .logo { width: 70px; height: 70px; font-size: 28px; }
     }
@@ -45,36 +61,32 @@
     <section class="hero">
       <div class="logo">TT</div>
       <h1>Trend Thala AI</h1>
-      <p class="tagline">Expert Grok Prompt Generator • 100% Premium Quality</p>
+      <p class="tagline">Expert Grok Prompt Generator • Shorts + Reels + Affiliate</p>
     </section>
 
     <section class="card">
-      <div class="section-title">Create High-Quality Content</div>
-
-      <!-- Quick Templates -->
-      <div style="margin-bottom: 14px;">
-        <label>Quick Templates</label>
-        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-          <button class="preset-btn" onclick="useTemplate('movie')">🎬 Movie</button>
-          <button class="preset-btn" onclick="useTemplate('politics')">🗳️ Politics</button>
-          <button class="preset-btn" onclick="useTemplate('gossip')">🎥 Gossip</button>
-          <button class="preset-btn" onclick="useTemplate('cricket')">🏏 Cricket</button>
-          <button class="preset-btn" onclick="useTemplate('tech')">💻 Tech</button>
-          <button class="preset-btn" onclick="useTemplate('motivational')">🔥 Motivational</button>
-          <button class="preset-btn" onclick="useTemplate('meme')">😂 Meme Style</button>
-          <button class="preset-btn" onclick="useTemplate('clothing')">👕 Clothing / Fashion</button>
-          <button class="preset-btn" onclick="useTemplate('unique')">✨ Unique Product</button>
-        </div>
+      <label>Quick Templates</label>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <button class="preset-btn" onclick="useTemplate('movie')">🎬 Movie</button>
+        <button class="preset-btn" onclick="useTemplate('politics')">🗳️ Politics</button>
+        <button class="preset-btn" onclick="useTemplate('gossip')">🎥 Gossip</button>
+        <button class="preset-btn" onclick="useTemplate('cricket')">🏏 Cricket</button>
+        <button class="preset-btn" onclick="useTemplate('tech')">💻 Tech</button>
+        <button class="preset-btn" onclick="useTemplate('motivational')">🔥 Motivational</button>
+        <button class="preset-btn" onclick="useTemplate('meme')">😂 Meme</button>
+        <button class="preset-btn" onclick="useTemplate('clothing')">👕 Clothing</button>
+        <button class="preset-btn" onclick="useTemplate('unique')">✨ Unique Product</button>
       </div>
 
       <label>Topic / Product Name / Headline</label>
       <input id="topic" placeholder="Example: Premium Cotton Shirt for Men" />
 
       <label>Key Details / Product Description</label>
-      <textarea id="details" placeholder="Fabric, features, price, offers..."></textarea>
+      <textarea id="details" placeholder="Real features, fabric, price, offers... (required if you add a product link)"></textarea>
 
-      <label>Product Link (Amazon / Flipkart)</label>
+      <label>Product Link (Amazon / Flipkart) — optional</label>
       <input id="links" placeholder="Paste Amazon or Flipkart product link here" />
+      <div class="hint">⚠️ The AI cannot open this link. If you add it, fill "Key Details" with real specs/price — otherwise content may be inaccurate.</div>
 
       <label>Special Instructions</label>
       <textarea id="custom" placeholder="Example: Focus on styling, budget friendly, summer wear..."></textarea>
@@ -82,11 +94,9 @@
       <label>Reference Image (Optional)</label>
       <input type="file" id="imageUpload" accept="image/*" />
       <img id="imagePreview" class="preview" style="display:none;" />
-      <div id="imageCategory" style="margin-top: 8px; font-size: 13px; color: #22c55e;"></div>
+      <div id="imageCategory" class="hint"></div>
 
-      <!-- Additional Inputs -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
-        
         <div>
           <label>Target Platform</label>
           <select id="platform">
@@ -95,12 +105,10 @@
             <option value="instagram">Instagram Reels Only</option>
           </select>
         </div>
-
         <div>
           <label>Target Audience</label>
-          <input id="audience" placeholder="18-30 Youth / College Students" />
+          <input id="audience" placeholder="18-30 Youth / Students" />
         </div>
-
         <div>
           <label>Content Goal</label>
           <select id="goal">
@@ -111,7 +119,6 @@
             <option value="affiliate">Affiliate Sales / Clicks</option>
           </select>
         </div>
-
         <div>
           <label>Tone / Emotion</label>
           <select id="tone">
@@ -124,59 +131,95 @@
         </div>
       </div>
 
-      <!-- Creator Style -->
-      <div style="margin: 16px 0;">
-        <label>Content Style</label>
-        <select id="style" style="width: 100%; padding: 13px; border-radius: 12px; border: none; font-size: 15px; background: #fff; color: #111;">
-          <option value="mr-tamilan">Mr Tamilan (Energetic & Punchy)</option>
-          <option value="behindwoods">Behindwoods (Professional)</option>
-          <option value="cinema-vikatan">Cinema Vikatan (Spicy)</option>
-          <option value="star-sports">Star Sports (Passionate)</option>
-          <option value="tech-satish">Tech Satish (Clear)</option>
-          <option value="tamil-motivational">Tamil Motivational</option>
-          <option value="meme">Meme Style (Funny & Relatable)</option>
-        </select>
-      </div>
+      <label>Content Style</label>
+      <select id="style">
+        <option value="mr-tamilan">Mr Tamilan (Energetic & Punchy)</option>
+        <option value="behindwoods">Behindwoods (Professional)</option>
+        <option value="cinema-vikatan">Cinema Vikatan (Spicy)</option>
+        <option value="star-sports">Star Sports (Passionate)</option>
+        <option value="tech-satish">Tech Satish (Clear)</option>
+        <option value="tamil-motivational">Tamil Motivational</option>
+        <option value="meme">Meme Style</option>
+      </select>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div><label>Mood</label><select id="mood"><option>Dramatic</option><option>Shocking</option><option>Emotional</option><option>Funny</option><option>Powerful</option></select></div>
         <div><label>Main Figure / Model</label><input id="figure" placeholder="Model name or description" /></div>
       </div>
 
-      <!-- Buttons -->
-      <button class="btn primary" onclick="generatePack()" id="generateBtn">🚀 Generate Expert Prompts</button>
-      <button class="btn meme-btn" onclick="generateMemePack()" id="memeBtn">😂 Meme Poster Prompts</button>
-      <button class="btn" style="background: linear-gradient(45deg, #8b5cf6, #ec4899); margin-top: 8px;" onclick="generateMemePageMode()" id="memePageBtn">🛍️ Affiliate Product Mode</button>
-      <button class="btn" style="background: linear-gradient(45deg, #ff0000, #ff6a00); margin-top: 8px;" onclick="generateHighEngagement()" id="engagementBtn">🔥 High Engagement Mode</button>
-      <button class="btn secondary" onclick="copyOutput()">📋 Copy Full Pack</button>
-      <button class="btn" style="background:#3b82f6;margin-top:8px" onclick="exportAsPDF()">📄 Export as PDF</button>
+      <!-- Mode toggles -->
+      <label>Modes</label>
+      <div class="toggle-row">
+        <button type="button" class="toggle-btn" id="toggle-meme" onclick="toggleMode('meme')">😂 Meme Page (Image Only)</button>
+        <button type="button" class="toggle-btn" id="toggle-engagement" onclick="toggleMode('engagement')">🔥 High Engagement</button>
+        <button type="button" class="toggle-btn" id="toggle-affiliate" onclick="toggleMode('affiliate')">🛍️ Affiliate Product</button>
+      </div>
 
+      <!-- Content Angle (shown for affiliate mode) -->
+      <div id="angleWrap" style="display:none;">
+        <label>Content Angle</label>
+        <select id="contentAngle">
+          <option value="auto">Let AI Choose Best Angle</option>
+          <option value="styling">3 Ways to Style This</option>
+          <option value="first_impression">Unboxing / First Impression</option>
+          <option value="comparison">Budget vs Premium Comparison</option>
+          <option value="problem_solution">Problem → This Fixes It</option>
+        </select>
+        <div class="banner">⚠️ Affiliate disclosure will be auto-added to the YouTube description and Instagram caption.</div>
+      </div>
+
+      <button class="btn primary" onclick="generatePack()" id="generateBtn">🚀 Generate Content Pack</button>
+
+      <div id="errorBox"></div>
       <div class="spinner" id="spinner"></div>
-      <div id="output" class="output" style="display:none;"></div>
+      <div id="output"></div>
+
+      <button class="btn secondary" id="copyAllBtn" style="display:none;" onclick="copyAll()">📋 Copy Everything</button>
+      <button class="btn" style="background:#3b82f6;display:none;" id="pdfBtn" onclick="exportAsPDF()">📄 Export as PDF</button>
     </section>
   </div>
 
   <script>
-    let finalOutput = "";
+    let lastData = null;
     let imageBase64 = null;
     let imageMime = null;
+
+    let modes = { meme: false, engagement: false, affiliate: false };
+
+    function toggleMode(name) {
+      modes[name] = !modes[name];
+      document.getElementById('toggle-' + name).classList.toggle('active', modes[name]);
+      document.getElementById('angleWrap').style.display = modes.affiliate ? 'block' : 'none';
+    }
 
     function useTemplate(type) {
       const topicEl = document.getElementById('topic');
       const detailsEl = document.getElementById('details');
-      
+
       if (type === 'clothing') {
         topicEl.value = "Premium Cotton Shirt for Men - Summer 2026";
-        detailsEl.value = "Breathable cotton, slim fit, multiple colors, perfect for office and casual wear";
+        detailsEl.value = "Breathable cotton, slim fit, available in 5 colors, ₹799, machine washable, ideal for office and casual wear";
       } else if (type === 'unique') {
         topicEl.value = "Portable Mini Projector for Mobile Phones";
-        detailsEl.value = "HD quality, built-in speaker, easy to carry, best for travel and home entertainment";
+        detailsEl.value = "HD 1080p support, built-in speaker, ₹1499, USB-C and HDMI input, foldable stand included";
       } else if (type === 'movie') {
         topicEl.value = "Vijay's new movie creates record opening";
         detailsEl.value = "Vijay's latest film breaks box office records";
       } else if (type === 'politics') {
         topicEl.value = "Vijay TVK meeting creates huge buzz";
         detailsEl.value = "Vijay addresses massive crowd in Chennai";
+      } else if (type === 'gossip') {
+        topicEl.value = "Suriya comeback after 13 years shocks industry";
+        detailsEl.value = "Suriya returns with powerful role";
+      } else if (type === 'cricket') {
+        topicEl.value = "MS Dhoni's new record creates history";
+        detailsEl.value = "Dhoni breaks another record in IPL";
+      } else if (type === 'tech') {
+        topicEl.value = "Tamil Nadu startup gets $100 million funding";
+        detailsEl.value = "Chennai-based startup becomes unicorn";
+      } else if (type === 'motivational') {
+        topicEl.value = "From daily wage worker to IAS officer";
+        detailsEl.value = "Inspiring journey of determination";
       } else if (type === 'meme') {
         topicEl.value = "This one thing changed everything";
         detailsEl.value = "Funny but powerful life lesson";
@@ -184,34 +227,52 @@
       }
     }
 
-    document.getElementById('imageUpload').addEventListener('change', async e => {
+    document.getElementById('imageUpload').addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
-      try {
-        document.getElementById('imageCategory').innerText = "⏳ Optimizing image...";
-        const reader = new FileReader();
-        reader.onload = ev => {
-          imageBase64 = ev.target.result.split(',')[1];
-          imageMime = file.type;
-          document.getElementById('imagePreview').src = ev.target.result;
-          document.getElementById('imagePreview').style.display = 'block';
-          document.getElementById('imageCategory').innerText = "✅ Image ready";
-        };
-        reader.readAsDataURL(file);
-      } catch (err) {
+      document.getElementById('imageCategory').innerText = "⏳ Optimizing image...";
+      const reader = new FileReader();
+      reader.onload = ev => {
+        imageBase64 = ev.target.result.split(',')[1];
+        imageMime = file.type;
+        document.getElementById('imagePreview').src = ev.target.result;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('imageCategory').innerText = "✅ Image ready";
+      };
+      reader.onerror = () => {
         document.getElementById('imageCategory').innerText = "❌ Image processing failed";
-      }
+      };
+      reader.readAsDataURL(file);
     });
 
+    function showError(msg) {
+      document.getElementById('errorBox').innerHTML = `<div class="error-banner">${msg}</div>`;
+    }
+    function clearError() {
+      document.getElementById('errorBox').innerHTML = '';
+    }
+
     async function generatePack() {
+      clearError();
+      const links = document.getElementById('links').value.trim();
+      const details = document.getElementById('details').value.trim();
+
+      if (links && !details) {
+        showError("⚠️ You added a product link but no Key Details. Please add real product details (features, price, material, etc.) for accurate content.");
+        return;
+      }
+
       const btn = document.getElementById('generateBtn');
       btn.disabled = true;
       document.getElementById('spinner').style.display = 'block';
+      document.getElementById('output').innerHTML = '';
+      document.getElementById('copyAllBtn').style.display = 'none';
+      document.getElementById('pdfBtn').style.display = 'none';
 
       const data = {
         topic: document.getElementById('topic').value.trim(),
-        details: document.getElementById('details').value.trim(),
-        links: document.getElementById('links').value.trim(),
+        details: details,
+        links: links,
         custom: document.getElementById('custom').value.trim(),
         mood: document.getElementById('mood').value,
         figure: document.getElementById('figure').value.trim(),
@@ -220,7 +281,11 @@
         audience: document.getElementById('audience').value.trim(),
         goal: document.getElementById('goal').value,
         tone: document.getElementById('tone').value,
-        imageBase64, imageMime
+        contentAngle: document.getElementById('contentAngle') ? document.getElementById('contentAngle').value : 'auto',
+        imageBase64, imageMime,
+        memePageMode: modes.meme,
+        highEngagement: modes.engagement,
+        affiliateMode: modes.affiliate
       };
 
       try {
@@ -230,168 +295,129 @@
           body: JSON.stringify(data)
         });
         const result = await res.json();
-        finalOutput = result.content || "Generation completed.";
+
+        if (!result.success) {
+          showError("❌ " + (result.error || "Generation failed."));
+          if (result.raw) {
+            document.getElementById('output').innerHTML =
+              `<div class="result-card"><h4>Raw Output</h4><div class="result-content">${escapeHtml(result.raw)}</div></div>`;
+          }
+        } else {
+          lastData = result.data;
+          renderOutput(lastData);
+          document.getElementById('copyAllBtn').style.display = 'block';
+          document.getElementById('pdfBtn').style.display = 'block';
+        }
       } catch (e) {
-        finalOutput = "❌ API failed. Please try again.";
+        showError("❌ Request failed. Please try again.");
       }
 
-      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
-      document.getElementById('output').style.display = 'block';
       document.getElementById('spinner').style.display = 'none';
       btn.disabled = false;
     }
 
-    async function generateMemePack() {
-      const btn = document.getElementById('memeBtn');
-      btn.disabled = true;
-      btn.innerHTML = "Generating...";
-
-      const data = {
-        topic: document.getElementById('topic').value.trim(),
-        details: document.getElementById('details').value.trim(),
-        custom: document.getElementById('custom').value.trim(),
-        mood: document.getElementById('mood').value,
-        figure: document.getElementById('figure').value.trim(),
-        style: "meme",
-        platform: document.getElementById('platform').value,
-        audience: document.getElementById('audience').value.trim(),
-        goal: document.getElementById('goal').value,
-        tone: document.getElementById('tone').value,
-        imageBase64, imageMime
-      };
-
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        finalOutput = result.content || "Generation completed.";
-      } catch (e) {
-        finalOutput = "❌ Failed.";
-      }
-
-      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
-      document.getElementById('output').style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = "😂 Meme Poster Prompts";
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[m]));
     }
 
-    async function generateMemePageMode() {
-      const btn = document.getElementById('memePageBtn');
-      btn.disabled = true;
-      btn.innerHTML = "Generating...";
-
-      const data = {
-        topic: document.getElementById('topic').value.trim(),
-        details: document.getElementById('details').value.trim(),
-        links: document.getElementById('links').value.trim(),
-        custom: document.getElementById('custom').value.trim(),
-        mood: document.getElementById('mood').value,
-        figure: document.getElementById('figure').value.trim(),
-        style: "meme",
-        platform: document.getElementById('platform').value,
-        audience: document.getElementById('audience').value.trim(),
-        goal: document.getElementById('goal').value,
-        tone: document.getElementById('tone').value,
-        imageBase64, imageMime,
-        memePageMode: true
-      };
-
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        finalOutput = result.content || "Generation completed.";
-      } catch (e) {
-        finalOutput = "❌ Failed.";
-      }
-
-      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
-      document.getElementById('output').style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = "🛍️ Affiliate Product Mode";
+    function card(title, content, extraHtml = '', copyId = '') {
+      const id = copyId || ('copy_' + Math.random().toString(36).slice(2));
+      return `
+        <div class="result-card">
+          <h4>${title}</h4>
+          <div class="result-content" id="${id}">${escapeHtml(content)}</div>
+          ${extraHtml}
+          <button class="copy-btn" onclick="copyField('${id}')">📋 Copy</button>
+        </div>`;
     }
 
-    async function generateHighEngagement() {
-      const btn = document.getElementById('engagementBtn');
-      btn.disabled = true;
-      btn.innerHTML = "Generating...";
-
-      const data = {
-        topic: document.getElementById('topic').value.trim(),
-        details: document.getElementById('details').value.trim(),
-        custom: document.getElementById('custom').value.trim(),
-        mood: document.getElementById('mood').value,
-        figure: document.getElementById('figure').value.trim(),
-        style: document.getElementById('style').value,
-        platform: document.getElementById('platform').value,
-        audience: document.getElementById('audience').value.trim(),
-        goal: document.getElementById('goal').value,
-        tone: document.getElementById('tone').value,
-        imageBase64, imageMime,
-        highEngagement: true
-      };
-
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        finalOutput = result.content || "Generation completed.";
-      } catch (e) {
-        finalOutput = "❌ Failed.";
-      }
-
-      document.getElementById('output').innerHTML = formatWithCopyButtons(finalOutput);
-      document.getElementById('output').style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = "🔥 High Engagement Mode";
+    function copyField(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText);
+      el.style.outline = '2px solid #22c55e';
+      setTimeout(() => el.style.outline = 'none', 400);
     }
 
-    function formatWithCopyButtons(text) {
-      let html = `<div style="background:rgba(0,0,0,0.4);padding:18px;border-radius:14px;">${text}</div>`;
-      const parts = text.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
-      parts.forEach((part, i) => {
-        const num = i + 1;
-        html += `<button onclick="copyPart(${num})" class="copy-btn">📋 Copy PART ${num}</button>`;
-      });
-      return html;
+    function copyAll() {
+      if (!lastData) return;
+      navigator.clipboard.writeText(buildFullText(lastData));
+      alert("✅ Everything copied!");
     }
 
-    function copyPart(num) {
-      const parts = finalOutput.match(/PART \d+:[^]*?(?=PART \d+:|$)/g) || [];
-      if (parts[num-1]) {
-        let content = parts[num-1].replace(/^PART \d+:\s*/i, '').trim();
-        navigator.clipboard.writeText(content);
-        alert(`✅ PART ${num} Copied!`);
-      }
+    function buildFullText(d) {
+      let parts = [];
+      parts.push("CONCEPT:\n" + d.concept);
+      if (d.image_prompt) parts.push("IMAGE PROMPT:\n" + d.image_prompt);
+      if (d.video_prompt) parts.push("VIDEO PROMPT:\n" + d.video_prompt);
+      if (d.voiceover_script) parts.push("VOICEOVER SCRIPT:\n" + d.voiceover_script);
+      parts.push("YOUTUBE TITLES:\n" + (d.youtube_titles || []).join("\n"));
+      parts.push("YOUTUBE DESCRIPTION:\n" + d.youtube_description);
+      parts.push("INSTAGRAM CAPTION:\n" + d.instagram_caption);
+      parts.push("HASHTAGS (YOUTUBE):\n" + (d.hashtags?.youtube || []).join(" "));
+      parts.push("HASHTAGS (INSTAGRAM):\n" + (d.hashtags?.instagram || []).join(" "));
+      parts.push("THUMBNAIL TEXT:\n" + (d.thumbnail_text || []).join("\n"));
+      if (d.affiliate_disclosure) parts.push("AFFILIATE DISCLOSURE:\n" + d.affiliate_disclosure);
+      return parts.join("\n\n---\n\n");
     }
 
-    function copyOutput() {
-      if (finalOutput) {
-        navigator.clipboard.writeText(finalOutput);
-        alert("✅ Full Pack Copied!");
+    function renderOutput(d) {
+      let html = '';
+
+      html += card("Concept & Strategy", d.concept, '', 'f_concept');
+
+      if (d.image_prompt) {
+        html += card("Grok Image Prompt (9:16)", d.image_prompt, '', 'f_image');
       }
+
+      if (d.video_prompt) {
+        html += card(
+          "Grok Video Prompt (10s, time-coded)",
+          d.video_prompt,
+          `<div class="video-hint">💡 Generate the image above in Grok first, then use this video prompt with that image as the starting frame (image-to-video) for best consistency.</div>`,
+          'f_video'
+        );
+      }
+
+      if (d.voiceover_script) {
+        html += card("Voiceover Script (Tamil)", d.voiceover_script, '', 'f_voice');
+      }
+
+      html += card("YouTube Titles", (d.youtube_titles || []).join("\n"), '', 'f_titles');
+      html += card("YouTube Description", d.youtube_description, '', 'f_ytdesc');
+      html += card("Instagram Caption", d.instagram_caption, '', 'f_igcap');
+
+      const yt = (d.hashtags?.youtube || []).join(" ");
+      const ig = (d.hashtags?.instagram || []).join(" ");
+      html += card("Hashtags — YouTube", yt, '', 'f_hyt');
+      html += card("Hashtags — Instagram", ig, '', 'f_hig');
+
+      html += card("Thumbnail Text Ideas", (d.thumbnail_text || []).join("\n"), '', 'f_thumb');
+
+      if (d.affiliate_disclosure) {
+        html += card("Affiliate Disclosure (already included above)", d.affiliate_disclosure, '', 'f_disc');
+      }
+
+      if (d.content_angle_used) {
+        html += `<div class="result-card"><h4>Content Angle Used</h4><div class="chip-list"><span class="chip">${escapeHtml(d.content_angle_used)}</span></div></div>`;
+      }
+
+      document.getElementById('output').innerHTML = html;
     }
 
     function exportAsPDF() {
-      if (!finalOutput) return alert("Generate something first!");
+      if (!lastData) return alert("Generate something first!");
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text("Trend Thala AI - Expert Prompts", 20, 20);
-      doc.setFontSize(11);
-      const lines = doc.splitTextToSize(finalOutput, 170);
-      doc.text(lines, 20, 35);
-      doc.save("Trend_Thala_AI_Prompts.pdf");
-      alert("✅ PDF Downloaded!");
+      doc.setFontSize(16);
+      doc.text("Trend Thala AI - Content Pack", 14, 16);
+      doc.setFontSize(10);
+      const text = buildFullText(lastData);
+      const lines = doc.splitTextToSize(text, 180);
+      doc.text(lines, 14, 28);
+      doc.save("Trend_Thala_AI_Pack.pdf");
     }
   </script>
 </body>
