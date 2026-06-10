@@ -32,81 +32,86 @@ module.exports = async (req, res) => {
       memePageMode = false
     } = req.body || {};
 
-    const clean = (value, max = 1500) => String(value || "").trim().slice(0, max);
+    const clean = (value, max = 2000) => String(value || "").trim().slice(0, max);
 
-    const safeTopic = clean(topic, 250);
-    const safeDetails = clean(details, 2000);
-    const safeLinks = clean(links, 1000);
-    const safeCustom = clean(custom, 1000);
-    const safeFigure = clean(figure, 120);
-    const safeAudience = clean(audience, 300);
-    const safeGoal = clean(goal, 50);
-    const safeTone = clean(tone, 50);
+    const safeTopic = clean(topic, 300);
+    const safeDetails = clean(details, 2500);
+    const safeLinks = clean(links, 1200);
+    const safeCustom = clean(custom, 1200);
+    const safeFigure = clean(figure, 150);
+    const safeAudience = clean(audience, 400);
+    const safeGoal = clean(goal, 60);
+    const safeTone = clean(tone, 60);
 
     if (!safeTopic && !safeDetails && !imageBase64) {
       return res.status(400).json({ success: false, error: "Please provide a topic, details, or image." });
     }
 
     const styleMap = {
-      "mr-tamilan": "Energetic Tamil creator style — dramatic, direct, punchy, fast-paced.",
-      "behindwoods": "Professional Tamil entertainment news style — clean, polished, engaging.",
-      "cinema-vikatan": "Spicy Tamil cinema gossip style — catchy, but avoid defamation.",
-      "star-sports": "Passionate Tamil sports commentator style — emotional, energetic.",
-      "tech-satish": "Clear Tamil tech explainer style — simple, useful, practical.",
-      "tamil-motivational": "Emotional Tamil motivational style — inspiring and powerful.",
-      "meme": "Balanced meme style — funny, educative, meaningful, shareable."
+      "mr-tamilan": "High-energy, dramatic, direct, punchy Tamil creator style with strong hooks and personality.",
+      "behindwoods": "Professional, polished, exciting entertainment/news style.",
+      "cinema-vikatan": "Spicy, fast-paced, gossip-style with curiosity.",
+      "star-sports": "Passionate, emotional, high-energy commentator style.",
+      "tech-satish": "Clear, simple, practical, and exciting tech explanation style.",
+      "tamil-motivational": "Emotional, inspiring, powerful, and story-driven style.",
+      "meme": "Funny, relatable, shareable, meme-style content."
     };
 
     const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
 
     let modeInstruction = "";
     if (memePageMode) {
-      modeInstruction = `**MEME PAGE MODE ACTIVATED** - Focus on funny, shareable meme content.`;
+      modeInstruction = `**MEME PAGE MODE**: Focus on funny, relatable, highly shareable meme content. Make visuals bold and meme-style.`;
     }
     if (highEngagement) {
-      modeInstruction += `**HIGH ENGAGEMENT MODE ACTIVATED** - Create powerful hooks and high-retention content.`;
+      modeInstruction += `**HIGH ENGAGEMENT MODE**: Prioritize maximum retention, emotional hooks, pattern interrupts, and strong calls-to-action.`;
     }
 
     const systemPrompt = `
-You are an expert Grok Prompt Engineer specialized in creating powerful, hooky, and engaging voiceover scripts for Tamil YouTube Shorts and Instagram Reels.
+You are a world-class expert in viral short-form content creation and advanced prompt engineering for Grok (image & video generation).
+
+Your goal is to produce **extremely high-quality, ready-to-use content and Grok prompts** that feel 100% professional and high-converting — especially for affiliate marketing in Clothing and Unique Products categories.
+
+### Core Rules (Must Follow Strictly):
+1. Think step-by-step before generating each section.
+2. Every output must feel premium, natural, and emotionally engaging.
+3. Use advanced storytelling techniques: strong hooks, emotional triggers, curiosity, social proof, and clear benefit.
+4. For Clothing: Focus on styling, look enhancement, fabric feel, occasion, and visual transformation.
+5. For Unique Products: Highlight surprise factor, usefulness, "you didn't know you needed this" angle.
+6. Voiceover must start with a powerful hook in first 3-5 seconds and maintain high energy.
+7. Grok Image & Video prompts must be extremely detailed, structured, and cinematic.
+8. Avoid generic or average language. Every line should feel intentional and high-quality.
 
 ${modeInstruction}
 
-### Voiceover Script Rules (PART 4) - VERY IMPORTANT:
-- Start with a **strong hook in the first 3-5 seconds** (question, shocking fact, direct address, or curiosity gap).
-- Use short, punchy sentences.
-- Make it emotional and energetic according to the selected Tone.
-- Add natural rhythm and flow suitable for Shorts (fast delivery).
-- Use the selected Creator Style (especially Mr Tamilan style when chosen).
-- End with a strong line that makes people want to watch till the end or comment.
+Output **EXACTLY** in this format with high-quality content:
 
-Output EXACTLY in this format:
-
-PART 1: Image Analysis & Repurposing Idea
-PART 2: Grok Image Prompt (Regenerated Poster - 9:16 Vertical)
-PART 3: Grok Text-to-Video Prompt (Single Powerful Structured Prompt)
-PART 4: Grok Voiceover Script (Strong Hook + Powerful & Engaging Tamil)
-PART 5: YouTube Title Options (SEO Optimized)
-PART 6: YouTube Description
-PART 7: Instagram Caption + Hashtags
-PART 8: Thumbnail Text Ideas
+PART 1: Content Concept & Strategy
+PART 2: Grok Image Prompt (Highly Detailed 9:16 Poster)
+PART 3: Grok Text-to-Video Prompt (Structured + Cinematic)
+PART 4: Grok Voiceover Script (Powerful Hook + Engaging Delivery)
+PART 5: YouTube Title Options (Best Performing)
+PART 6: YouTube Description (SEO + Strong CTA)
+PART 7: Instagram Caption + Hashtags (High Engagement)
+PART 8: Thumbnail Text Ideas (Click-worthy)
 `;
 
     const userPrompt = `
-${imageBase64 ? "An image has been uploaded. Analyze it carefully and create content based on it." : ""}
+Create premium-quality affiliate content.
 
 Topic: ${safeTopic || "Not provided"}
-Details: ${safeDetails || "Not provided"}
-Custom Instructions: ${safeCustom || "Not provided"}
+Key Details: ${safeDetails || "Not provided"}
+Product Link / Extra Info: ${safeLinks || "Not provided"}
+Special Instructions: ${safeCustom || "Not provided"}
 Mood: ${mood}
-Main Figure: ${safeFigure || "Not provided"}
+Main Figure / Model: ${safeFigure || "Not provided"}
 Creator Style: ${selectedStyle}
 Target Platform: ${platform}
-Target Audience: ${safeAudience || "Tamil social media audience"}
+Target Audience: ${safeAudience || "Tamil audience"}
 Content Goal: ${safeGoal}
 Tone: ${safeTone}
 
-Generate high-quality Grok prompts. Make the voiceover script (PART 4) especially powerful, hooky, and engaging.
+Generate the highest quality output possible following all rules above. Focus on making the voiceover and Grok prompts exceptionally strong and professional.
 `;
 
     const messages = [{ role: "system", content: systemPrompt }];
@@ -115,7 +120,7 @@ Generate high-quality Grok prompts. Make the voiceover script (PART 4) especiall
       messages.push({
         role: "user",
         content: [
-          { type: "text", text: userPrompt },
+          { type: "text", text: userPrompt + "\n\nAn image is uploaded. Analyze it deeply and create content around it." },
           { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } }
         ]
       });
@@ -132,8 +137,8 @@ Generate high-quality Grok prompts. Make the voiceover script (PART 4) especiall
       body: JSON.stringify({
         model: imageBase64 ? "gpt-4o" : "gpt-4o-mini",
         messages,
-        temperature: 0.87,
-        max_tokens: 4000
+        temperature: 0.88,
+        max_tokens: 4200
       })
     });
 
