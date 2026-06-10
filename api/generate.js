@@ -61,34 +61,31 @@ module.exports = async (req, res) => {
 
     let modeInstruction = "";
     if (memePageMode) {
-      modeInstruction = `**MEME PAGE MODE ACTIVATED** - Focus on funny, shareable meme content and bold poster regeneration.`;
+      modeInstruction = `**MEME PAGE MODE ACTIVATED** - Focus on funny, shareable meme content.`;
     }
     if (highEngagement) {
       modeInstruction += `**HIGH ENGAGEMENT MODE ACTIVATED** - Create powerful hooks and high-retention content.`;
     }
 
     const systemPrompt = `
-You are an expert Grok Prompt Engineer specialized in image repurposing and viral content creation for Tamil YouTube Shorts and Instagram.
+You are an expert Grok Prompt Engineer specialized in creating powerful, hooky, and engaging voiceover scripts for Tamil YouTube Shorts and Instagram Reels.
 
 ${modeInstruction}
 
-### Image Repurposing Rules (Very Important):
-When an image is uploaded:
-- Carefully analyze the uploaded image (visual elements, text, emotion, composition, style, colors).
-- Create a **new and improved poster version** in PART 2 (Grok Image Prompt).
-- Make the regenerated poster better than the original (better text placement, stronger visual impact, more engaging for Shorts/Reels).
-- Connect the image strongly with the given topic and details.
-
-### Grok Prompt Rules:
-- PART 2 (Image Prompt): Highly detailed for Grok image generation (9:16 vertical).
-- PART 3 (Text-to-Video Prompt): One powerful structured prompt with scenes, camera, text overlays, and effects.
+### Voiceover Script Rules (PART 4) - VERY IMPORTANT:
+- Start with a **strong hook in the first 3-5 seconds** (question, shocking fact, direct address, or curiosity gap).
+- Use short, punchy sentences.
+- Make it emotional and energetic according to the selected Tone.
+- Add natural rhythm and flow suitable for Shorts (fast delivery).
+- Use the selected Creator Style (especially Mr Tamilan style when chosen).
+- End with a strong line that makes people want to watch till the end or comment.
 
 Output EXACTLY in this format:
 
 PART 1: Image Analysis & Repurposing Idea
 PART 2: Grok Image Prompt (Regenerated Poster - 9:16 Vertical)
-PART 3: Grok Text-to-Video Prompt (Single Powerful Prompt)
-PART 4: Grok Voiceover Script (Strong Hook + Natural Tamil)
+PART 3: Grok Text-to-Video Prompt (Single Powerful Structured Prompt)
+PART 4: Grok Voiceover Script (Strong Hook + Powerful & Engaging Tamil)
 PART 5: YouTube Title Options (SEO Optimized)
 PART 6: YouTube Description
 PART 7: Instagram Caption + Hashtags
@@ -96,7 +93,7 @@ PART 8: Thumbnail Text Ideas
 `;
 
     const userPrompt = `
-${imageBase64 ? "An image has been uploaded. Analyze it carefully and regenerate a better poster version." : ""}
+${imageBase64 ? "An image has been uploaded. Analyze it carefully and create content based on it." : ""}
 
 Topic: ${safeTopic || "Not provided"}
 Details: ${safeDetails || "Not provided"}
@@ -109,7 +106,7 @@ Target Audience: ${safeAudience || "Tamil social media audience"}
 Content Goal: ${safeGoal}
 Tone: ${safeTone}
 
-Generate high-quality Grok prompts focused on image repurposing and viral posting content.
+Generate high-quality Grok prompts. Make the voiceover script (PART 4) especially powerful, hooky, and engaging.
 `;
 
     const messages = [{ role: "system", content: systemPrompt }];
@@ -135,7 +132,7 @@ Generate high-quality Grok prompts focused on image repurposing and viral postin
       body: JSON.stringify({
         model: imageBase64 ? "gpt-4o" : "gpt-4o-mini",
         messages,
-        temperature: 0.85,
+        temperature: 0.87,
         max_tokens: 4000
       })
     });
