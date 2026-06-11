@@ -1,281 +1,265 @@
-module.exports = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+// api/generate.js  —  TrendThala backend  (Node / Express route)
+// POST /api/generate
 
-  if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+const { OpenAI } = require('openai');
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// ── SAFE DEFAULT OUTPUT ────────────────────────────────────────────────────
+const SAFE_OUT = {
+  concept: '',
+  image_prompt: '',
+  video_prompt: '',
+  voiceover: '',
+  titles: '',
+  description: '',
+  caption: '',
+  hashtags_yt: '',
+  hashtags_ig: '',
+  thumbnail_text: '',
+  disclosure_line: '',
+  originality_notes: '',
+};
+
+// ── FORMAT CONFIGS ─────────────────────────────────────────────────────────
+const FORMAT_RULES = {
+  hottake: {
+    label: 'Hot Take',
+    voiceInstruction: 'Lead with a bold, controversial opinion as the hook. State your take in the first 4 seconds, then back it up with 1–2 sharp facts. End with a challenge to the viewer.',
+    conceptNote: 'This is a personal opinion Short. The voiceover must clearly express the creator\'s view, not neutral narration.',
+  },
+  explainer: {
+    label: 'Explainer',
+    voiceInstruction: 'Break down the topic in simple terms. Use the structure: "Here\'s what happened → here\'s why it matters → here\'s what you need to know." No jargon.',
+    conceptNote: 'Educational Short. Prioritise clarity and context over hype.',
+  },
+  reaction: {
+    label: 'Reaction',
+    voiceInstruction: 'React authentically to the news/trend. Express genuine emotion (surprise, excitement, disbelief). Phrase as "I can\'t believe..." or "Wait, did you see this?" before explaining.',
+    conceptNote: 'Reaction Short — energy and authenticity matter more than polish here.',
+  },
+  storytime: {
+    label: 'Story-time',
+    voiceInstruction: 'Tell the story in chronological narrative. Use "So here\'s what happened..." as the opener. Build tension toward a reveal or twist. First person where possible.',
+    conceptNote: 'Narrative Short — hook the viewer with story structure, not just facts.',
+  },
+  debate: {
+    label: 'Debate / POV',
+    voiceInstruction: 'Frame this as "Here\'s why [X] is right/wrong." Present the opposing view briefly (5 sec) then dismantle it. End with your verdict.',
+    conceptNote: 'POV Short — designed to drive comments and debate. Strong, clear stance required.',
+  },
+};
+
+// ── LANGUAGE CONFIGS ───────────────────────────────────────────────────────
+function langInstructions(voiceLang) {
+  if (voiceLang === 'tamil') {
+    return `Write the ENTIRE voiceover script in pure Tamil (Tamil script: தமிழ்). No English words unless the word has no Tamil equivalent (e.g. brand names). Natural spoken Tamil, not formal.`;
   }
-
-  try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ success: false, error: "OpenAI key missing" });
-    }
-
-    const {
-      topic = "",
-      details = "",
-      links = "",
-      custom = "",
-      mood = "Powerful",
-      figure = "",
-      style = "mr-tamilan",
-      platform = "both",
-      audience = "",
-      goal = "views",
-      tone = "Funny",
-      contentAngle = "auto",
-      voiceoverLanguage = "tamil",
-      imageBase64 = null,
-      imageMime = null,
-      highEngagement = false,
-      memePageMode = false,
-      affiliateMode = false
-    } = req.body || {};
-
-    const clean = (value, max = 2000) => String(value || "").trim().slice(0, max);
-
-    const safeTopic = clean(topic, 300);
-    const safeDetails = clean(details, 2500);
-    const safeLinks = clean(links, 1200);
-    const safeCustom = clean(custom, 1200);
-    const safeFigure = clean(figure, 150);
-    const safeAudience = clean(audience, 400);
-    const safeGoal = clean(goal, 60);
-    const safeTone = clean(tone, 60);
-    const safeAngle = clean(contentAngle, 60);
-    const safeVoiceLang = ["tamil", "english", "tanglish"].includes(String(voiceoverLanguage).toLowerCase())
-      ? String(voiceoverLanguage).toLowerCase()
-      : "tamil";
-
-    if (!safeTopic && !safeDetails && !imageBase64) {
-      return res.status(400).json({ success: false, error: "Please provide a topic, details, or image." });
-    }
-
-    // ---- Hard validation: affiliate link without details is not allowed ----
-    if (safeLinks && !safeDetails) {
-      return res.status(400).json({
-        success: false,
-        error: "A product link was provided but Key Details / Product Description is empty. Please add real product details (features, price, fabric/material, etc.) so the content is accurate. Avoid generating claims about a product the AI cannot see."
-      });
-    }
-
-    const styleMap = {
-      "mr-tamilan": "High-energy, dramatic, direct, punchy Tamil creator style with strong personality.",
-      "behindwoods": "Professional, polished, exciting entertainment/news style.",
-      "cinema-vikatan": "Spicy, fast-paced, gossip-style with curiosity.",
-      "star-sports": "Passionate, emotional, high-energy commentator style.",
-      "tech-satish": "Clear, simple, practical, and exciting tech explanation style.",
-      "tamil-motivational": "Emotional, inspiring, powerful, and story-driven style.",
-      "meme": "Funny, relatable, shareable, meme-style content."
-    };
-    const selectedStyle = styleMap[style] || styleMap["mr-tamilan"];
-
-    const voiceLangMap = {
-      tamil: `Write voiceover_script almost entirely in Tamil script (தமிழ்), with only unavoidable English brand/product/tech terms left in English. For audiences who read/speak pure Tamil.`,
-      english: `Write voiceover_script entirely in English. For audiences who prefer English content (pan-India / NRI / English-speaking viewers).`,
-      tanglish: `Write voiceover_script in natural Tanglish (mixed Tamil + English, in Latin script), matching how young Tamil creators actually speak. Default for general Tamil social media audiences.`
-    };
-    const voiceLanguageInstruction = voiceLangMap[safeVoiceLang] || voiceLangMap.tamil;
-
-
-    const angleMap = {
-      styling: `Use the "3 Ways to Style This" structure: open on the item, then show 3 quick styling/usage variations, end on the best/favorite one.`,
-      first_impression: `Use the "Unboxing / First Impression" structure: open with anticipation/curiosity, reveal the product, react to first impression, end with a verdict line.`,
-      comparison: `Use the "Budget vs Premium Comparison" structure: contrast this item against a common alternative (cheaper or more expensive), highlight the difference that matters most, end with a recommendation.`,
-      problem_solution: `Use the "Problem → This Fixes It" structure: open by showing/describing a relatable problem, introduce the product as the fix, show the payoff, end with a CTA.`,
-      auto: `Choose whichever proven short-form structure (styling demo, first impression, comparison, or problem-solution) best fits the given topic and details.`
-    };
-    const angleInstruction = angleMap[safeAngle] || angleMap.auto;
-
-    // ---- Mode modifiers ----
-    let modeNotes = [];
-    if (memePageMode) {
-      modeNotes.push(
-        `MEME PAGE MODE: This is an image-only post (no video, no voiceover). ` +
-        `Set "video_prompt" and "voiceover_script" to empty strings "". ` +
-        `Make "image_prompt" bold, funny, meme-style, text-heavy, and highly shareable. ` +
-        `Still fill in titles, description, caption, hashtags, and thumbnail_text normally.`
-      );
-    }
-    if (highEngagement) {
-      modeNotes.push(
-        `HIGH ENGAGEMENT MODE: Push hooks and pacing to maximum intensity. Use stronger ` +
-        `emotional triggers (shock, curiosity, anger, inspiration), pattern interrupts, ` +
-        `and cliffhangers. Prioritize watch-time and comments over subtlety.`
-      );
-    }
-    if (affiliateMode) {
-      modeNotes.push(
-        `AFFILIATE PRODUCT MODE: This content promotes a real product for affiliate ` +
-        `commission (Amazon/Flipkart). ${angleInstruction} ` +
-        `CRITICAL ACCURACY RULE: Only mention features, materials, price, or specs that ` +
-        `appear in the "Key Details" provided by the user. Do NOT invent specifications, ` +
-        `prices, ratings, or claims. If something isn't in the details, keep that part ` +
-        `general/aspirational instead of inventing facts. ` +
-        `Always populate "affiliate_disclosure" with a short, natural disclosure line ` +
-        `(e.g. "Affiliate link in bio/description — I may earn a small commission on ` +
-        `purchases made through it."), in Tamil-English mix matching the overall tone, ` +
-        `and APPEND this disclosure line at the end of both "youtube_description" and ` +
-        `"instagram_caption".`
-      );
-    } else {
-      modeNotes.push(`Set "affiliate_disclosure" to an empty string "".`);
-    }
-
-    const modeInstructions = modeNotes.join("\n");
-
-    // ---- System prompt ----
-    const systemPrompt = `
-You are an expert short-form video content strategist and Grok prompt engineer for Tamil YouTube Shorts and Instagram Reels.
-
-You must respond with ONLY a single valid JSON object — no markdown fences, no commentary, no PART labels, nothing outside the JSON. The JSON must exactly match this schema (all keys required, use empty string "" or empty array [] where a field doesn't apply):
-
-{
-  "concept": "string - 1-2 sentence content concept and strategy",
-  "image_prompt": "string - highly detailed Grok image prompt, 9:16 vertical poster",
-  "video_prompt": "string - time-coded Grok video prompt (see VIDEO PROMPT RULES)",
-  "voiceover_script": "string - Tamil voiceover script (see VOICEOVER RULES)",
-  "youtube_titles": ["string", "string", "string"],
-  "youtube_description": "string - SEO description with CTA",
-  "instagram_caption": "string - caption with relevant hashtags woven in naturally",
-  "hashtags": { "youtube": ["string", "..."], "instagram": ["string", "..."] },
-  "thumbnail_text": ["string", "string", "string"],
-  "affiliate_disclosure": "string",
-  "content_angle_used": "string - short label of the structure used"
+  if (voiceLang === 'english') {
+    return `Write the entire voiceover script in English. Clear, punchy, conversational. Avoid translating Tamil-specific cultural context — just explain it directly.`;
+  }
+  // Default: Tanglish
+  return `Write the voiceover script in Tanglish — natural mix of spoken Tamil and English written in Latin script (Roman letters). This is how ANPAVAAM's Tamil audience actually speaks. Example style: "Bro, idu nambave mudiyala — Vijay ippadi oru move pannitaar, antha crowd reaction paaru..." Do NOT write in Tamil script.`;
 }
 
-=== VOICEOVER RULES (voiceover_script) ===
-- LANGUAGE: ${voiceLanguageInstruction}
-- The opening hook (first 2-4 seconds, roughly 8-12 words MAX) must use ONE of these patterns:
-  1. Direct question to viewer ("Idha vachu paathaala?")
-  2. Bold claim / shock fact ("Ithu 299 dhaan, aana...")
-  3. Pattern interrupt / contradiction ("Ellarum ithai thappa pannranga")
-  4. Direct address / "stop scrolling" style
-  5. Before-you-buy warning ("Itha vaangurathuku munnadi itha paarunga")
-- Total script should be roughly 25-35 words (matches a 10-second video at natural pace), adjusted naturally for the chosen language above.
-- End with either a comment/follow/save CTA, or a curiosity-gap line.
-- Example hook style for reference (do not copy verbatim, match the energy):
-  "Bro, idha 3 naal use pannitu sொnnen — life changed!"
+// ── AFFILIATE ANGLE CONFIGS ────────────────────────────────────────────────
+const AFFILIATE_ANGLES = {
+  styling:         'Structure: "3 ways to style/use [product]" — show versatility, not features.',
+  firstimpression: 'Structure: Unboxing-first-impression — "I didn\'t expect this to be this good." Lead with surprise, then back it up with 2 real details.',
+  comparison:      'Structure: Side-by-side comparison — cheap alternative vs this product. Be honest. Specify price difference.',
+  problemsolution: 'Structure: Problem → Solution. Name a real problem your audience has, then position this product as the fix. Be specific.',
+  auto:            'Choose the content angle most likely to drive clicks for this product type and price point. Explain your choice in originality_notes.',
+};
 
-=== VIDEO PROMPT RULES (video_prompt) ===
-Always output video_prompt in this exact 4-segment, time-coded structure (10-second video), filling in the bracketed parts:
+// ── HOOK PATTERNS ──────────────────────────────────────────────────────────
+const HOOK_PATTERNS = [
+  '(Number) + (Surprising fact) — e.g. "90% of people don\'t know this about Vijay\'s plan"',
+  'Controversy opener — e.g. "This is going to make people angry..."',
+  'Cliffhanger — e.g. "What happened next shocked everyone..."',
+  'Direct challenge — e.g. "You need to see this before it gets deleted"',
+  'Personal reaction — e.g. "I literally couldn\'t believe this when I saw it..."',
+];
 
-[0:00-0:02] Opening shot: <hook visual matching the voiceover hook, camera angle, motion, and matching the composition described in image_prompt so it can be used as the first frame (image-to-video)>
-[0:02-0:05] Reveal/context: <subject/product shown clearly, camera movement, setting>
-[0:05-0:08] Benefit/payoff shot: <key visual moment, lighting, action, emotional peak>
-[0:08-0:10] Closing shot + text overlay: <final framing, on-screen CTA text>
+// ── SYSTEM PROMPT BUILDER ─────────────────────────────────────────────────
+function buildSystemPrompt({ format, voiceLang, modes, affiliate }) {
+  const fmt = FORMAT_RULES[format] || FORMAT_RULES.hottake;
+  const langRule = langInstructions(voiceLang);
+  const isAffiliate = modes.affiliate && affiliate;
+  const isMeme = modes.meme;
 
-Style: <visual style e.g. cinematic/meme/dramatic>, 9:16 vertical, <color grading note>, <pacing note>
-On-screen text: <exact overlay text per segment, short and bold>
+  const affiliateAngleRule = isAffiliate
+    ? `\nAFFILIATE CONTENT ANGLE: ${AFFILIATE_ANGLES[affiliate.angle] || AFFILIATE_ANGLES.auto}`
+    : '';
 
-Note: image_prompt should describe the scene used for [0:00-0:02] in detail so the same generated image can be fed into Grok's image-to-video as the starting frame.
+  const disclosureRule = isAffiliate
+    ? `\nDISCLOSURE: You MUST append "#ad #affiliate" at the end of both the YouTube description and Instagram caption. Also generate a standalone disclosure_line field: "Affiliate link in bio. This is a paid/sponsored mention. #ad"`
+    : '';
 
-=== IMAGE PROMPT RULES (image_prompt) ===
-- Extremely detailed: composition, subject placement, text overlay style/position, lighting, color palette, mood, 9:16 vertical.
-- Must visually correspond to the [0:00-0:02] segment of video_prompt.
+  const memeRule = isMeme
+    ? `\nMEME PAGE MODE: This is meme/entertainment content. Set voiceover = "" (empty string) and video_prompt should describe a meme-style reel, not a product/news video.`
+    : '';
 
-=== MODE INSTRUCTIONS ===
-${modeInstructions}
+  return `You are the content engine for ANPAVAAM, a Tamil YouTube Shorts channel that covers trending news, politics (TVK / Vijay), viral moments, and cinema buzz — always with the creator's own commentary and take, NOT generic narration.
 
-=== GENERAL ===
-- Use Target Platform, Target Audience, Content Goal, and Tone to shape titles, captions, and hashtags.
-- Creator Style: ${selectedStyle}
-- Keep youtube_titles to 3 strong, SEO-searchable options.
-- thumbnail_text: 3 short, bold, click-worthy text options.
-- Output valid JSON only.
-`;
+CHANNEL IDENTITY:
+- Original commentary-first Shorts (not reposts, not clip compilations)
+- Creator's personal opinions and reactions are the spine of every video
+- Audience: Tamil speakers, 16–35, interested in politics + entertainment + viral culture
+- Visual style: Bold, high-contrast, text overlays, Grok-generated AI visuals
 
-    const userPrompt = `
-${imageBase64 ? "An image has been uploaded — analyze it carefully and base image_prompt and video_prompt's opening segment on it." : ""}
+YOUR JOB:
+Generate a complete JSON object for one piece of content. Every field must be filled (except disclosure_line when not affiliate mode, and voiceover/video in meme mode).
 
-Topic / Product Name: ${safeTopic || "Not provided"}
-Key Details / Product Description: ${safeDetails || "Not provided"}
-Product Link (for context only, do not assume unseen specs): ${safeLinks || "Not provided"}
-Special Instructions: ${safeCustom || "Not provided"}
-Mood: ${mood}
-Main Figure / Model: ${safeFigure || "Not provided"}
-Target Platform: ${platform}
-Target Audience: ${safeAudience || "Tamil social media audience"}
-Content Goal: ${safeGoal}
-Tone: ${safeTone}
+FORMAT THIS VIDEO: ${fmt.label}
+${fmt.conceptNote}
 
-Generate the JSON object now.
-`;
+VOICEOVER RULES:
+${langRule}
+- Hook: MUST match one of these 5 patterns:
+${HOOK_PATTERNS.map((p, i) => `  ${i + 1}. ${p}`).join('\n')}
+- Hook must be under 12 words, delivered in under 4 seconds
+- Total voiceover: 30–40 words (matches 10-second Short pacing)
+- Voiceover instruction for this format: ${fmt.voiceInstruction}
+- NEVER use generic openers like "Hey guys" or "Welcome back"
+- The creator's take/opinion MUST be present, not just facts${affiliateAngleRule}${disclosureRule}${memeRule}
 
-    const messages = [{ role: "system", content: systemPrompt }];
+VIDEO PROMPT RULES (Grok, 10-second Short):
+Time-code every segment. The opening segment (0–2s) MUST visually match the image_prompt so the poster can be used as the image-to-video starting frame.
+Format exactly like:
+[0–2s] Hook shot — [describe scene]
+[2–5s] Context reveal — [describe scene]
+[5–8s] Payoff / benefit — [describe scene]
+[8–10s] CTA + text overlay — [describe scene, overlay text]
 
-    if (imageBase64 && imageMime) {
-      messages.push({
-        role: "user",
-        content: [
-          { type: "text", text: userPrompt },
-          { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } }
-        ]
-      });
-    } else {
-      messages.push({ role: "user", content: userPrompt });
+IMAGE PROMPT RULES:
+Cinematic, bold, high-contrast. Specify: subject, lighting, angle, mood, style (e.g. "dramatic rim lighting, low angle, dark background, bold Tamil text overlay"). No people's real faces.
+
+TITLES: Generate 3 title options. Mix styles: one curiosity gap, one bold statement, one question. All under 60 chars.
+
+DESCRIPTION: YouTube description, 80–120 words, includes timestamps if applicable, channel links.
+
+CAPTION: Instagram caption, punchy, under 150 chars, ends with CTA.
+
+HASHTAGS_YT: 8 YouTube hashtags (mix Tamil + English, trend-relevant).
+
+HASHTAGS_IG: 15 Instagram hashtags.
+
+THUMBNAIL_TEXT: 3–5 bold words for thumbnail overlay. ALL CAPS. Maximum visual impact.
+
+ORIGINALITY NOTES:
+In the originality_notes field, write 1–2 sentences for the creator explaining: (1) what makes this piece of content original vs generic narration of the same topic, and (2) one tip to vary the format next time to avoid the "content factory" pattern. Address the creator directly ("Your hook here...")
+
+CRITICAL: Respond with ONLY a valid JSON object. No preamble, no markdown backticks, no explanation. Start with { and end with }.
+
+JSON SCHEMA:
+{
+  "concept": "string — content concept, hook strategy, and format rationale",
+  "image_prompt": "string — Grok image prompt",
+  "video_prompt": "string — time-coded 10-second video prompt",
+  "voiceover": "string — voiceover script in specified language",
+  "titles": "string — 3 title options, one per line",
+  "description": "string — YouTube description",
+  "caption": "string — Instagram caption",
+  "hashtags_yt": "string — YouTube hashtags",
+  "hashtags_ig": "string — Instagram hashtags",
+  "thumbnail_text": "string — thumbnail overlay text",
+  "disclosure_line": "string — affiliate disclosure (empty string if not affiliate mode)",
+  "originality_notes": "string — channel health note for the creator"
+}`;
+}
+
+// ── USER PROMPT BUILDER ────────────────────────────────────────────────────
+function buildUserPrompt({ topic, yourTake, keyDetails, affiliate, modes }) {
+  let prompt = `TOPIC: ${topic}`;
+
+  if (yourTake) {
+    prompt += `\n\nCREATOR'S TAKE (use this as the voiceover spine — this is their actual opinion):
+${yourTake}`;
+  }
+
+  if (keyDetails) {
+    prompt += `\n\nKEY DETAILS TO INCLUDE:
+${keyDetails}`;
+  }
+
+  if (modes.affiliate && affiliate) {
+    if (affiliate.productLink) {
+      prompt += `\n\nPRODUCT LINK: ${affiliate.productLink}
+NOTE: You cannot read this link. All product details come from what is provided below.`;
     }
+    if (affiliate.productDetails) {
+      prompt += `\n\nPRODUCT DETAILS (use ONLY these — do not invent specs):
+${affiliate.productDetails}`;
+    }
+  }
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: imageBase64 ? "gpt-4o" : "gpt-4o-mini",
-        messages,
-        temperature: highEngagement ? 0.9 : 0.85,
-        max_tokens: 4200,
-        response_format: { type: "json_object" }
-      })
+  return prompt;
+}
+
+// ── MAIN HANDLER ──────────────────────────────────────────────────────────
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const {
+    topic, yourTake = '', keyDetails = '',
+    voiceLang = 'tanglish', format = 'hottake',
+    modes = { meme: false, engage: true, affiliate: false },
+    affiliate = null,
+  } = req.body;
+
+  // Validate
+  if (!topic || !topic.trim()) {
+    return res.status(400).json({ error: 'Topic is required.' });
+  }
+  if (modes.affiliate && affiliate?.productLink && !affiliate?.productDetails?.trim()) {
+    return res.status(400).json({
+      error: 'You pasted a product link but Key Details is empty. GPT cannot read Amazon/Flipkart links — fill in the real product name, price, and features to avoid hallucinated specs.'
+    });
+  }
+
+  const systemPrompt = buildSystemPrompt({ format, voiceLang, modes, affiliate });
+  const userPrompt   = buildUserPrompt({ topic, yourTake, keyDetails, affiliate, modes });
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      max_tokens: 1800,
+      temperature: 0.82,
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user',   content: userPrompt },
+      ],
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("OpenAI API error:", data);
-      return res.status(response.status).json({ success: false, error: data?.error?.message || "OpenAI API failed" });
-    }
-
-    const raw = data?.choices?.[0]?.message?.content || "{}";
+    const raw = completion.choices[0]?.message?.content || '{}';
 
     let parsed;
     try {
       parsed = JSON.parse(raw);
-    } catch (e) {
-      return res.status(200).json({
-        success: false,
-        error: "Model returned invalid JSON. Showing raw output.",
-        raw
-      });
+    } catch {
+      // Strip accidental markdown fences
+      const clean = raw.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
     }
 
-    // Ensure all expected keys exist (defensive defaults)
-    const safeOut = {
-      concept: parsed.concept || "",
-      image_prompt: parsed.image_prompt || "",
-      video_prompt: parsed.video_prompt || "",
-      voiceover_script: parsed.voiceover_script || "",
-      youtube_titles: Array.isArray(parsed.youtube_titles) ? parsed.youtube_titles : [],
-      youtube_description: parsed.youtube_description || "",
-      instagram_caption: parsed.instagram_caption || "",
-      hashtags: {
-        youtube: Array.isArray(parsed?.hashtags?.youtube) ? parsed.hashtags.youtube : [],
-        instagram: Array.isArray(parsed?.hashtags?.instagram) ? parsed.hashtags.instagram : []
-      },
-      thumbnail_text: Array.isArray(parsed.thumbnail_text) ? parsed.thumbnail_text : [],
-      affiliate_disclosure: parsed.affiliate_disclosure || "",
-      content_angle_used: parsed.content_angle_used || ""
-    };
+    // Merge with safe defaults so no field is ever missing
+    const output = { ...SAFE_OUT, ...parsed };
 
-    return res.status(200).json({ success: true, data: safeOut });
+    // Meme page mode: clear voiceover + disclosure
+    if (modes.meme) {
+      output.voiceover = '';
+    }
+    // Non-affiliate: clear disclosure
+    if (!modes.affiliate) {
+      output.disclosure_line = '';
+    }
+
+    return res.status(200).json(output);
 
   } catch (err) {
-    console.error("Generation error:", err);
-    return res.status(500).json({ success: false, error: "Generation failed" });
+    console.error('TrendThala generate error:', err);
+    return res.status(500).json({ error: err.message || 'Generation failed. Try again.' });
   }
 };
