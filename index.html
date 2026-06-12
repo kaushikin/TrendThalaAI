@@ -88,6 +88,20 @@
       <input id="links" placeholder="Paste Amazon or Flipkart product link here" />
       <div class="hint">⚠️ The AI cannot open this link. If you add it, fill "Key Details" with real specs/price — otherwise content may be inaccurate.</div>
 
+      <label>Your Take / Opinion (recommended)</label>
+      <textarea id="yourTake" placeholder="What's YOUR opinion on this? e.g. 'I think Vijay's move is more strategy than emotion, here's why...'"></textarea>
+      <div class="hint">💡 This becomes the spine of the voiceover. YouTube flags channels for "reused content" when videos are just news recaps with no original commentary — your opinion is what makes it yours.</div>
+
+      <label>Content Format</label>
+      <select id="contentFormat">
+        <option value="auto">Auto-rotate (recommended for variety)</option>
+        <option value="hot_take">🔥 Hot Take</option>
+        <option value="explainer">🧠 Explainer</option>
+        <option value="reaction">😲 Reaction</option>
+        <option value="story_time">📖 Story-time</option>
+        <option value="debate_pov">⚖️ Debate / POV</option>
+      </select>
+
       <label>Special Instructions</label>
       <textarea id="custom" placeholder="Example: Focus on styling, budget friendly, summer wear..."></textarea>
 
@@ -290,6 +304,8 @@
         goal: document.getElementById('goal').value,
         tone: document.getElementById('tone').value,
         voiceoverLanguage: document.getElementById('voiceoverLanguage').value,
+        yourTake: document.getElementById('yourTake').value.trim(),
+        contentFormat: document.getElementById('contentFormat').value,
         contentAngle: document.getElementById('contentAngle') ? document.getElementById('contentAngle').value : 'auto',
         imageBase64, imageMime,
         memePageMode: modes.meme,
@@ -410,7 +426,11 @@
       }
 
       if (d.content_angle_used) {
-        html += `<div class="result-card"><h4>Content Angle Used</h4><div class="chip-list"><span class="chip">${escapeHtml(d.content_angle_used)}</span></div></div>`;
+        html += `<div class="result-card"><h4>Content Angle / Format Used</h4><div class="chip-list"><span class="chip">${escapeHtml(d.content_angle_used)}</span></div></div>`;
+      }
+
+      if (d.originality_notes) {
+        html += `<div class="result-card"><h4>📝 Originality Check (for you, don't post)</h4><div class="result-content">${escapeHtml(d.originality_notes)}</div></div>`;
       }
 
       document.getElementById('output').innerHTML = html;
