@@ -90,6 +90,20 @@ module.exports = async (req, res) => {
     };
     const angleInstruction = angleMap[safeAngle] || angleMap.auto;
 
+    // ---- News/Trend format map (originality & variety, non-affiliate content) ----
+    const formatMap = {
+      hot_take: `Format: HOT TAKE. Open by stating the news/topic in one line, then immediately give a strong, opinionated take on it (per "Your Take" below). The whole video is built around defending/explaining that opinion.`,
+      explainer: `Format: EXPLAINER. Open with a "wait, what's actually going on here?" hook, then break down the situation in 2-3 simple beats, ending with what it means going forward.`,
+      reaction: `Format: REACTION. Open showing/describing the moment that caused buzz, then react to it in real time tone — surprise, agreement, disagreement — woven with "Your Take".`,
+      story_time: `Format: STORY-TIME. Open with a narrative hook ("Oru nimisham..." / "So this happened..."), tell the situation as a mini-story with a beginning-middle-twist structure, end with the takeaway.`,
+      debate_pov: `Format: DEBATE / POV. Present the topic as two sides briefly, then land firmly on "Your Take" as the stance, inviting viewers to agree/disagree in comments.`,
+      auto: `Choose whichever of these formats (Hot Take, Explainer, Reaction, Story-time, Debate/POV) best fits the topic and "Your Take" provided — vary it naturally rather than defaulting to the same one every time.`
+    };
+    const safeFormat = clean(req.body?.contentFormat || "auto", 60);
+    const formatInstruction = formatMap[safeFormat] || formatMap.auto;
+
+    const safeYourTake = clean(req.body?.yourTake || "", 1500);
+
     // ---- Mode modifiers ----
     let modeNotes = [];
     if (memePageMode) {
@@ -144,7 +158,8 @@ You must respond with ONLY a single valid JSON object — no markdown fences, no
   "hashtags": { "youtube": ["string", "..."], "instagram": ["string", "..."] },
   "thumbnail_text": ["string", "string", "string"],
   "affiliate_disclosure": "string",
-  "content_angle_used": "string - short label of the structure used"
+  "content_angle_used": "string - short label of the structure used",
+  "originality_notes": "string - 1-2 sentences on what makes THIS video's angle/commentary original (for the creator's own reference, not for posting)"
 }
 
 === VOICEOVER RULES (voiceover_script) ===
@@ -176,6 +191,21 @@ Note: image_prompt should describe the scene used for [0:00-0:02] in detail so t
 === IMAGE PROMPT RULES (image_prompt) ===
 - Extremely detailed: composition, subject placement, text overlay style/position, lighting, color palette, mood, 9:16 vertical.
 - Must visually correspond to the [0:00-0:02] segment of video_prompt.
+
+=== ORIGINALITY & FORMAT RULES (Critical for monetization eligibility) ===
+This channel was previously flagged for "reused content" by YouTube. Every script you
+generate MUST feel like an original take from a real creator, not a repackaged news
+summary. Follow these rules:
+
+- ${formatInstruction}
+- "Your Take" provided by the creator: ${safeYourTake || "Not provided — generate a clear, defensible opinion/angle yourself and state it explicitly in the script."}
+- The voiceover_script MUST center on this opinion/angle, not just restate the news.
+  Phrases like "என் opinion-ல", "எனக்கு தோணுச்சு", "Honestly", "I think" (in the
+  selected language) should anchor the take.
+- Do NOT write generic "here's what happened" news-anchor narration as the dominant
+  tone — that pattern is what gets flagged as repetitive/reused.
+- "originality_notes" must briefly state what specific opinion/angle/twist makes this
+  video different from a plain news recap.
 
 === MODE INSTRUCTIONS ===
 ${modeInstructions}
@@ -269,7 +299,8 @@ Generate the JSON object now.
       },
       thumbnail_text: Array.isArray(parsed.thumbnail_text) ? parsed.thumbnail_text : [],
       affiliate_disclosure: parsed.affiliate_disclosure || "",
-      content_angle_used: parsed.content_angle_used || ""
+      content_angle_used: parsed.content_angle_used || "",
+      originality_notes: parsed.originality_notes || ""
     };
 
     return res.status(200).json({ success: true, data: safeOut });
